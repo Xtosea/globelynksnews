@@ -1,0 +1,32 @@
+export const posts = [
+  {
+    title: "FG Announces New Fuel Subsidy Update",
+    slug: "fuel-subsidy-update",
+    date: "2026-01-30",
+    excerpt: "The federal government has released a new statement...",
+    content: "...",
+    category: "breaking",
+    author: "Globelynks News",
+    image: "/images/fuel.jpg",
+  },
+  {
+    title: "My First Blog Post",
+    slug: "my-first-blog-post",
+    date: "2026-01-28",
+    excerpt: "This is a fresh blog post without Sanity.",
+    content: "Hello world! This is my first static blog post.",
+    category: "blog",
+    author: "Chris Ikelegbe",
+    image: "/images/cover1.jpg",
+  },
+  {
+    title: "Another Post",
+    slug: "another-post",
+    date: "2026-01-28",
+    excerpt: "Another static post example.",
+    content: "More content here...",
+    category: "blog",
+    author: "Chris Ikelegbe",
+    image: "/images/cover2.jpg",
+  },
+];
