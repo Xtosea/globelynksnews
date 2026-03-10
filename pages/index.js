@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"
-import BreakingTicker from "../components/BreakingTicker"
-import TrendingSidebar from "../components/TrendingSidebar"
+a
 import AdBlock from "../components/AdBlock"
 import StickyShare from "../components/StickyShare"
 import Link from "next/link"
