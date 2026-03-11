@@ -1,20 +1,29 @@
-import { NextResponse } from "next/server";
-import { connectDB } from '@/lib/mongodb';
-import Post from "../../../models/Post";
+await Article.create({
+  title: item.title,
 
-export async function GET() {
-  try {
-    await connectDB();
+  slug: item.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-"),
 
-    const posts = await Post.find({})
-      .sort({ publishedAt: -1 });
+  excerpt: item.contentSnippet || "",
 
-    return NextResponse.json(posts);
-  } catch (err) {
-    console.error("GET /api/posts error:", err);
-    return NextResponse.json(
-      { message: "Server error" },
-      { status: 500 }
-    );
-  }
-}
+  content: item.content || "",
+
+  image: item.enclosure?.url || "",
+
+  category: item.categories?.[0] || "General",
+
+  source: feedInfo.source,
+
+  originalUrl: item.link || "",
+
+  type: "rss",
+
+  views: 0,
+
+  published: true,
+
+  createdAt: item.pubDate
+    ? new Date(item.pubDate)
+    : new Date(),
+});
