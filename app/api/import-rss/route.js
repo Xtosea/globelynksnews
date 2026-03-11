@@ -1,36 +1,27 @@
 // /app/api/posts/route.js
-import { NextResponse } from "next/server";      // Next.js response helpers
-import { connectDB } from "@/lib/mongodb";       // Function to connect to MongoDB
-import Post from "@/models/Post";                // Local posts schema
-import Article from "@/models/Article";          // RSS posts schema
+import { NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb";
+import Post from "@/models/Post";
+import Article from "@/models/Article";
 
 export async function GET() {
   try {
-    // ✅ Ensure MONGODB_URI exists
+    // Return empty array if DB is not configured
     if (!process.env.MONGODB_URI) {
-      console.warn("MONGODB_URI is missing!");
+      console.warn("MONGODB_URI not set!");
       return NextResponse.json([], { status: 200 });
     }
 
-    // 🔌 Connect to MongoDB
+    // Connect to DB safely
     await connectDB();
 
-    // 🔹 Fetch local posts
-    const localPosts = await Post.find({})
-      .sort({ publishedAt: -1 })
-      .lean();
+    const localPosts = await Post.find({}).sort({ publishedAt: -1 }).lean();
+    const rssPosts = await Article.find({}).sort({ createdAt: -1 }).lean();
 
-    // 🔹 Fetch RSS articles
-    const rssPosts = await Article.find({})
-      .sort({ createdAt: -1 })
-      .lean();
-
-    // 🔹 Merge and sort all posts by newest first
     const allPosts = [...localPosts, ...rssPosts].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
 
-    // 🔹 Ensure all posts have required fields for homepage
     const safePosts = allPosts.map(post => ({
       _id: post._id,
       slug: post.slug || (post.title ? post.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") : ""),
@@ -41,12 +32,10 @@ export async function GET() {
       source: post.source || "Local",
     }));
 
-    // ✅ Return merged posts
     return NextResponse.json(safePosts);
 
   } catch (err) {
     console.error("GET /api/posts error:", err);
-    // 🔹 Never crash build, return empty array on error
     return NextResponse.json([], { status: 200 });
   }
 }
