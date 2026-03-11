@@ -56,10 +56,7 @@ export default function Home() {
             </div>
           )}
 
-          <AdBlock />
-
-          {posts.slice(1).map(post => (
-            <div key={post._id} className="border-b pb-6">
+          
               <Link href={`/posts/${post.slug}`}>
                 <h2 className="text-xl font-bold hover:text-red-600">
                   {post.title}
