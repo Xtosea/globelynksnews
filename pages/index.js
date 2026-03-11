@@ -1,30 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react"
-import Navbar from "../components/Navbar"
-import Footer from "../components/Footer"
-import AdBlock from "../components/AdBlock"
-import StickyShare from "../components/StickyShare"
-import BreakingTicker from "../components/BreakingTicker"
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
-import Link from "next/link"
-import Image from "next/image"
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import AdBlock from "../components/AdBlock";
+import StickyShare from "../components/StickyShare";
+import BreakingTicker from "../components/BreakingTicker";
 
 export default function Home() {
-  const [posts, setPosts] = useState([])
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    const fetchPosts = () => {
-      fetch("/api/posts")
-        .then(res => res.json())
-        .then(data => setPosts(data))
-        .catch(err => console.error(err))
-    }
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch("/api/posts");
+        const data = await res.json();
+        setPosts(data);
+      } catch (err) {
+        console.error("Failed to fetch posts:", err);
+      }
+    };
 
-    fetchPosts()
-    const interval = setInterval(fetchPosts, 30000)
-    return () => clearInterval(interval)
-  }, [])
+    fetchPosts();
+    const interval = setInterval(fetchPosts, 30000); // Refresh every 30s
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
@@ -72,12 +74,11 @@ export default function Home() {
         </div>
 
         <div className="space-y-6">
-          
           <AdBlock />
         </div>
       </main>
 
       <Footer />
     </>
-  )
+  );
 }
