@@ -6,7 +6,7 @@ import Footer from "../components/Footer"
 import AdBlock from "../components/AdBlock"
 import StickyShare from "../components/StickyShare"
 import BreakingTicker from "../components/BreakingTicker"
-import TrendingSidebar from "../components/TrendingSidebar"
+
 import Link from "next/link"
 import Image from "next/image"
 
@@ -74,7 +74,7 @@ export default function Home() {
         </div>
 
         <div className="space-y-6">
-          <TrendingSidebar posts={posts} />
+          
           <AdBlock />
         </div>
       </main>
