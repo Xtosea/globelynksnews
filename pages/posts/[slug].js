@@ -1,48 +1,59 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import Head from "next/head"
+import Image from "next/image"
 
 export default function PostPage({ post }) {
   const slug = post.slug
 
-  // --- Views state ---
   const [views, setViews] = useState(post.views || 0)
-
-  useEffect(() => {
-    if (!slug) return
-
-    fetch(`/api/posts/${slug}/view`, { method: "POST" })
-      .then(res => res.json())
-      .then(data => {
-        if (data.views !== undefined) setViews(data.views)
-      })
-      .catch(err => console.error("Failed to increment view:", err))
-  }, [slug])
-
-  // --- Comments state ---
   const [comments, setComments] = useState([])
   const [name, setName] = useState("")
   const [message, setMessage] = useState("")
 
-  // Fetch comments on load
+  // Increment views
+  useEffect(() => {
+    if (!slug) return
+
+    const viewed = localStorage.getItem(`viewed-${slug}`)
+    if (viewed) return
+
+    fetch(`/api/posts/${slug}/view`, { method: "POST" })
+      .then(res => res.json())
+      .then(data => {
+        if (data.views !== undefined) {
+          setViews(data.views)
+          localStorage.setItem(`viewed-${slug}`, "true")
+        }
+      })
+      .catch(err => console.error(err))
+  }, [slug])
+
+  // Fetch comments
   useEffect(() => {
     if (!slug) return
 
     fetch(`/api/comments?slug=${slug}`)
       .then(res => res.json())
       .then(data => setComments(data))
-      .catch(err => console.error("Failed to fetch comments:", err))
   }, [slug])
 
-  // Submit new comment
+  // Submit comment
   const submitComment = async () => {
-    if (!name || !message) return alert("Please enter your name and message")
+    if (!name.trim() || !message.trim()) {
+      alert("Enter name and message")
+      return
+    }
 
     const res = await fetch("/api/comments", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ postSlug: slug, name, message }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        postSlug: slug,
+        name,
+        message,
+      }),
     })
 
     if (res.ok) {
@@ -50,8 +61,6 @@ export default function PostPage({ post }) {
       setComments(prev => [...prev, newComment])
       setName("")
       setMessage("")
-    } else {
-      alert("Failed to post comment")
     }
   }
 
@@ -59,7 +68,13 @@ export default function PostPage({ post }) {
     <>
       <Head>
         <title>{post.title} | Globelynks News</title>
+
         <meta name="description" content={post.excerpt} />
+
+        <link
+          rel="canonical"
+          href={`https://trendingnews.globelynks.com/posts/${post.slug}`}
+        />
 
         {/* Open Graph */}
         <meta property="og:type" content="article" />
@@ -70,11 +85,9 @@ export default function PostPage({ post }) {
           property="og:url"
           content={`https://trendingnews.globelynks.com/posts/${post.slug}`}
         />
-        <meta property="og:site_name" content="Globelynks News" />
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content={post.image} />
       </Head>
 
       <article className="max-w-3xl mx-auto px-6 py-10">
@@ -84,20 +97,27 @@ export default function PostPage({ post }) {
           {post.author} · {new Date(post.publishedAt).toDateString()}
         </p>
 
-        {/* Views */}
-        <p className="text-sm text-gray-500 mb-6">👁 {views.toLocaleString()} views</p>
+        <p className="text-sm text-gray-500 mb-6">
+          👁 {views.toLocaleString()} views
+        </p>
 
         {post.image && (
-          <img src={post.image} alt={post.title} className="w-full rounded-xl mb-8" />
+          <Image
+            src={post.image}
+            alt={post.title}
+            width={800}
+            height={450}
+            className="w-full rounded-xl mb-8"
+          />
         )}
 
         <div className="prose prose-lg max-w-none whitespace-pre-line mb-10">
           {post.content}
         </div>
 
-        {/* --- Comments Section --- */}
+        {/* COMMENTS */}
         <div className="mt-10">
-          <h3 className="font-bold mb-4">Comments</h3>
+          <h3 className="text-xl font-bold mb-4">Comments</h3>
 
           <input
             placeholder="Your name"
@@ -115,16 +135,21 @@ export default function PostPage({ post }) {
 
           <button
             onClick={submitComment}
-            className="bg-red-600 text-white px-4 py-2 rounded"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
           >
             Post Comment
           </button>
 
           <div className="mt-6 space-y-4">
             {comments.map(c => (
-              <div key={c._id} className="border-b pb-2">
+              <div key={c._id} className="border-b pb-3">
                 <p className="font-semibold">{c.name}</p>
+
                 <p className="text-sm text-gray-600">{c.message}</p>
+
+                <p className="text-xs text-gray-400">
+                  {new Date(c.createdAt).toLocaleString()}
+                </p>
               </div>
             ))}
           </div>
@@ -139,9 +164,13 @@ export async function getServerSideProps({ params }) {
     `${process.env.NEXT_PUBLIC_SITE_URL}/api/posts/${params.slug}`
   )
 
-  if (!res.ok) return { notFound: true }
+  if (!res.ok) {
+    return { notFound: true }
+  }
 
   const post = await res.json()
 
-  return { props: { post } }
+  return {
+    props: { post },
+  }
 }
