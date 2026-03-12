@@ -16,6 +16,11 @@ export default function Home() {
     const fetchPosts = async () => {
       try {
         const res = await fetch("/api/posts");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+
         const data = await res.json();
         setPosts(data);
       } catch (err) {
@@ -24,7 +29,9 @@ export default function Home() {
     };
 
     fetchPosts();
-    const interval = setInterval(fetchPosts, 30000); // Refresh every 30s
+
+    const interval = setInterval(fetchPosts, 60000); // refresh every 60s
+
     return () => clearInterval(interval);
   }, []);
 
@@ -35,10 +42,14 @@ export default function Home() {
       <StickyShare />
 
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
+        
+        {/* Main News Column */}
         <div className="md:col-span-3 space-y-10">
+
+          {/* Featured Article */}
           {posts[0] && (
             <div>
-              <Link href={`/posts/${posts[0].slug}`}>
+              <Link href={`/articles/${posts[0].slug || posts[0]._id}`}>
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">
                   {posts[0].title}
                 </h1>
@@ -58,9 +69,10 @@ export default function Home() {
             </div>
           )}
 
-          {posts.slice(1).map(post => (
+          {/* Other Articles */}
+          {posts.slice(1).map((post) => (
             <div key={post._id} className="border-b pb-6">
-              <Link href={`/posts/${post.slug}`}>
+              <Link href={`/articles/${post.slug || post._id}`}>
                 <h2 className="text-xl font-bold hover:text-red-600">
                   {post.title}
                 </h2>
@@ -71,11 +83,14 @@ export default function Home() {
               </p>
             </div>
           ))}
+
         </div>
 
+        {/* Sidebar */}
         <div className="space-y-6">
           <AdBlock />
         </div>
+
       </main>
 
       <Footer />
