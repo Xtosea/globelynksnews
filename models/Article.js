@@ -1,32 +1,83 @@
 import mongoose from "mongoose";
 
 const ArticleSchema = new mongoose.Schema({
-  // Core content
-  title: { type: String, required: true, unique: true },
-  content: { type: String }, // optional for RSS (can store excerpt)
-  
-  // Hybrid type
-  type: { 
-    type: String, 
-    enum: ["local", "rss"], 
-    default: "local" 
+  // Article title
+  title: {
+    type: String,
+    required: true,
+    unique: true
   },
 
-  // RSS specific
-  originalUrl: { type: String },  // external link
-  source: { type: String },       // e.g. TechCrunch
-  image: { type: String },
+  // Main content or excerpt
+  content: {
+    type: String
+  },
 
-  // SEO
-  slug: { type: String, unique: true, sparse: true },
+  // Image
+  image: {
+    type: String
+  },
 
-  category: { type: String, default: "General" },
-  tags: { type: [String], default: [] },
+  // Article type
+  type: {
+    type: String,
+    enum: ["local", "rss"],
+    default: "rss"
+  },
 
-  published: { type: Boolean, default: true },
-  views: { type: Number, default: 0 },
+  // External RSS article link
+  originalUrl: {
+    type: String
+  },
 
-  createdAt: { type: Date, default: Date.now },
+  // Source of article
+  source: {
+    type: String
+  },
+
+  // SEO slug
+  slug: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+
+  // Category
+  category: {
+    type: String,
+    default: "General"
+  },
+
+  // Tags
+  tags: {
+    type: [String],
+    default: []
+  },
+
+  // Publish control
+  published: {
+    type: Boolean,
+    default: true
+  },
+
+  // Views counter (for trending)
+  views: {
+    type: Number,
+    default: 0
+  },
+
+  // Date published
+  publishedAt: {
+    type: Date,
+    default: Date.now
+  },
+
+  // Created time
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+
 });
 
 export default mongoose.models.Article ||
