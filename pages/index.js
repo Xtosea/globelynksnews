@@ -5,12 +5,12 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdBlock from "../components/AdBlock";
 import StickyShare from "../components/StickyShare";
-import Image from "next/image";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
 
-  const placeholderImage = "/placeholder.png"; // make sure this exists in /public
+  // Placeholder image in /public
+  const placeholderImage = "/placeholder.png";
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -23,6 +23,7 @@ export default function Home() {
         const postData = await postRes.json();
         const articleData = await articleRes.json();
 
+        // Combine and sort newest first
         const combined = [...postData, ...articleData].sort((a, b) => {
           const dateA = new Date(a.publishedAt || a.createdAt);
           const dateB = new Date(b.publishedAt || b.createdAt);
@@ -46,10 +47,10 @@ export default function Home() {
       <StickyShare />
 
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
-        {/* Main posts section */}
         <div className="md:col-span-3 space-y-10">
           {posts[0] && (
             <div>
+              {/* Top post/article */}
               <a
                 href={posts[0].originalUrl || `/articles/${posts[0].slug}`}
                 target={posts[0].originalUrl ? "_blank" : "_self"}
@@ -60,14 +61,16 @@ export default function Home() {
                 </h1>
               </a>
 
-              {/* Top post image */}
-              <div className="w-full h-[400px] relative rounded overflow-hidden bg-gray-100">
-                <Image
+              {/* Top image */}
+              <div
+                className="w-full relative rounded overflow-hidden"
+                style={{ paddingTop: "56.25%" }} // 16:9 aspect
+              >
+                <img
                   src={posts[0].image || placeholderImage}
                   alt={posts[0].title || "News Image"}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  onError={(e) => { e.currentTarget.src = placeholderImage; }}
+                  className="absolute top-0 left-0 w-full h-full object-cover"
+                  onError={(e) => (e.currentTarget.src = placeholderImage)}
                 />
               </div>
 
@@ -85,7 +88,10 @@ export default function Home() {
 
           {/* Other posts/articles */}
           {posts.slice(1).map((post) => (
-            <div key={post._id || post.slug || Math.random()} className="border-b pb-6">
+            <div
+              key={post._id || post.slug || Math.random()}
+              className="border-b pb-6"
+            >
               <a
                 href={post.originalUrl || `/articles/${post.slug}`}
                 target={post.originalUrl ? "_blank" : "_self"}
@@ -94,14 +100,16 @@ export default function Home() {
                 <h2 className="text-xl font-bold hover:text-red-600">{post.title}</h2>
               </a>
 
-              {/* Article image */}
-              <div className="w-full h-[200px] relative rounded overflow-hidden bg-gray-100 my-2">
-                <Image
+              {/* Other images */}
+              <div
+                className="w-full relative rounded overflow-hidden my-2"
+                style={{ paddingTop: "50%" }} // 2:1 aspect
+              >
+                <img
                   src={post.image || placeholderImage}
                   alt={post.title || "News Image"}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  onError={(e) => { e.currentTarget.src = placeholderImage; }}
+                  className="absolute top-0 left-0 w-full h-full object-cover"
+                  onError={(e) => (e.currentTarget.src = placeholderImage)}
                 />
               </div>
 
@@ -116,7 +124,6 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
           <AdBlock />
         </div>
