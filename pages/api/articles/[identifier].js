@@ -1,3 +1,5 @@
+// pages/articles/[identifier].js
+
 import { connectDB } from "@/lib/mongodb"
 import Article from "@/models/Article"
 import mongoose from "mongoose"
@@ -5,7 +7,6 @@ import mongoose from "mongoose"
 export async function getStaticPaths() {
   await connectDB()
 
-  // Pre-render latest 100 articles
   const articles = await Article.find({ published: true })
     .sort({ createdAt: -1 })
     .limit(100)
@@ -37,7 +38,6 @@ export async function getStaticProps({ params }) {
     return { notFound: true }
   }
 
-  // 🚀 Redirect RSS articles
   if (post.type === "rss" && post.originalUrl) {
     return {
       redirect: {
@@ -49,6 +49,32 @@ export async function getStaticProps({ params }) {
 
   return {
     props: { post: JSON.parse(JSON.stringify(post)) },
-    revalidate: 3600, // Regenerate page every 1 hour
+    revalidate: 3600,
   }
+}
+
+export default function ArticlePage({ post }) {
+  return (
+    <div className="max-w-3xl mx-auto px-6 py-10">
+      <h1 className="text-4xl font-extrabold mb-4">{post.title}</h1>
+
+      {post.image && (
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full h-[400px] object-cover rounded mb-4"
+        />
+      )}
+
+      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+        {post.content}
+      </p>
+
+      {post.source && !post.originalUrl && (
+        <p className="mt-4 text-gray-400 text-sm">
+          Source: {post.source}
+        </p>
+      )}
+    </div>
+  )
 }
