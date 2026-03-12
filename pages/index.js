@@ -8,35 +8,32 @@ import StickyShare from "../components/StickyShare";
 import Link from "next/link";
 
 export default function Home() {
-  const [posts, setPosts] = useState([]);
+  const [content, setContent] = useState([]);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchContent = async () => {
       try {
-        // Fetch both local posts and articles
-        const [postRes, articleRes] = await Promise.all([
+        const [postsRes, articlesRes] = await Promise.all([
           fetch("/api/posts"),
-          fetch("/api/articles") // make sure this endpoint returns Article model data
+          fetch("/api/articles")
         ]);
 
-        const postData = await postRes.json();
-        const articleData = await articleRes.json();
+        const postsData = await postsRes.json();
+        const articlesData = await articlesRes.json();
 
-        // Combine, sort by date (newest first)
-        const combined = [...postData, ...articleData].sort((a, b) => {
-          const dateA = new Date(a.publishedAt || a.createdAt);
-          const dateB = new Date(b.publishedAt || b.createdAt);
-          return dateB - dateA;
-        });
+        // Merge both arrays, sort by date descending
+        const merged = [...postsData, ...articlesData].sort(
+          (a, b) => new Date(b.createdAt || b.publishedAt) - new Date(a.createdAt || a.publishedAt)
+        );
 
-        setPosts(combined);
+        setContent(merged);
       } catch (err) {
-        console.error("Failed to fetch posts/articles:", err);
+        console.error("Failed to fetch content:", err);
       }
     };
 
-    fetchPosts();
-    const interval = setInterval(fetchPosts, 30000); // refresh every 30s
+    fetchContent();
+    const interval = setInterval(fetchContent, 30000); // refresh every 30s
     return () => clearInterval(interval);
   }, []);
 
@@ -47,64 +44,65 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
         <div className="md:col-span-3 space-y-10">
-          {posts[0] && (
+          {content.length > 0 && content[0] && (
             <div>
-              {/* Top post or article */}
-              <a
-                href={posts[0].originalUrl || `/articles/${posts[0].slug}`}
-                target={posts[0].originalUrl ? "_blank" : "_self"}
-                rel={posts[0].originalUrl ? "noopener noreferrer" : ""}
+              <Link
+                href={content[0].type === "rss" && content[0].originalUrl ? content[0].originalUrl : `/posts/${content[0].slug}`}
+                target={content[0].type === "rss" ? "_blank" : "_self"}
               >
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">
-                  {posts[0].title}
+                  {content[0].title}
                 </h1>
-              </a>
+              </Link>
 
-              {posts[0].image && (
+              {content[0].image && (
                 <img
-                  src={posts[0].image}
-                  alt={posts[0].title}
-                  className="w-full h-[400px] object-cover rounded"
+                  src={content[0].image}
+                  alt={content[0].title}
+                  className="w-full h-[400px] object-cover rounded mb-2"
                 />
               )}
 
-              {posts[0].source && (
-                <p className="text-gray-400 text-sm mt-2">Source: {posts[0].source}</p>
+              {content[0].source && (
+                <p className="text-sm text-gray-400 mb-2">Source: {content[0].source}</p>
               )}
 
-              <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">
-                {posts[0].excerpt || posts[0].content}
-              </p>
+              {content[0].excerpt && (
+                <p className="mt-2 text-gray-600 dark:text-gray-300 text-lg">
+                  {content[0].excerpt || content[0].content}
+                </p>
+              )}
             </div>
           )}
 
           <AdBlock />
 
-          {posts.slice(1).map((post) => (
-            <div key={post._id} className="border-b pb-6">
-              <a
-                href={post.originalUrl || `/articles/${post.slug}`}
-                target={post.originalUrl ? "_blank" : "_self"}
-                rel={post.originalUrl ? "noopener noreferrer" : ""}
+          {content.slice(1).map((item) => (
+            <div key={item._id} className="border-b pb-6">
+              <Link
+                href={item.type === "rss" && item.originalUrl ? item.originalUrl : `/posts/${item.slug}`}
+                target={item.type === "rss" ? "_blank" : "_self"}
               >
-                <h2 className="text-xl font-bold hover:text-red-600">{post.title}</h2>
-              </a>
+                <h2 className="text-xl font-bold hover:text-red-600">{item.title}</h2>
+              </Link>
 
-              {post.image && (
+              {item.image && (
                 <img
-                  src={post.image}
-                  alt={post.title}
+                  src={item.image}
+                  alt={item.title}
                   className="w-full h-[200px] object-cover rounded my-2"
                 />
               )}
 
-              {post.source && (
-                <p className="text-gray-400 text-sm">Source: {post.source}</p>
+              {item.source && (
+                <p className="text-sm text-gray-400">Source: {item.source}</p>
               )}
 
-              <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
-                {post.excerpt || post.content}
-              </p>
+              {item.excerpt && (
+                <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
+                  {item.excerpt || item.content}
+                </p>
+              )}
             </div>
           ))}
         </div>
