@@ -5,13 +5,11 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdBlock from "../components/AdBlock";
 import StickyShare from "../components/StickyShare";
-import Image from "next/image"; // <-- use next/image
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
-
-  // Placeholder image if article/post has no image
-  const placeholderImage = "/placeholder.png"; // make sure this exists in public folder
+  const placeholderImage = "/placeholder.png"; // put a placeholder in public folder
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -21,9 +19,10 @@ export default function Home() {
           fetch("/api/articles"),
         ]);
 
-        const postData = await postRes.json();
-        const articleData = await articleRes.json();
+        const postData = (await postRes.json()) || [];
+        const articleData = (await articleRes.json()) || [];
 
+        // Combine both arrays and sort by date descending
         const combined = [...postData, ...articleData].sort((a, b) => {
           const dateA = new Date(a.publishedAt || a.createdAt);
           const dateB = new Date(b.publishedAt || b.createdAt);
@@ -33,13 +32,25 @@ export default function Home() {
         setPosts(combined);
       } catch (err) {
         console.error("Failed to fetch posts/articles:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchPosts();
-    const interval = setInterval(fetchPosts, 30000);
+    const interval = setInterval(fetchPosts, 30000); // refresh every 30s
     return () => clearInterval(interval);
   }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <p className="text-center mt-20 text-gray-500">Loading news...</p>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -48,36 +59,32 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
         <div className="md:col-span-3 space-y-10">
-          {posts[0] && (
+          {/* Top post/article */}
+          {posts[0] && typeof posts[0] === "object" && (
             <div>
-              {/* Top post/article */}
               <a
-                href={posts[0].originalUrl || `/articles/${posts[0].slug}`}
-                target={posts[0].originalUrl ? "_blank" : "_self"}
-                rel={posts[0].originalUrl ? "noopener noreferrer" : ""}
+                href={posts[0]?.originalUrl || `/articles/${posts[0]?.slug}`}
+                target={posts[0]?.originalUrl ? "_blank" : "_self"}
+                rel={posts[0]?.originalUrl ? "noopener noreferrer" : ""}
               >
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">
-                  {posts[0].title}
+                  {posts[0]?.title || "Untitled"}
                 </h1>
               </a>
 
-              {/* Image with next/image */}
-              <Image
-                src={posts[0].image || placeholderImage}
-                alt={posts[0].title || "News Image"}
-                width={1200} // adjust width
-                height={600} // adjust height
+              <img
+                src={posts[0]?.image || placeholderImage}
+                alt={posts[0]?.title || "News Image"}
                 className="w-full h-[400px] object-cover rounded"
-                placeholder="blur"
-                blurDataURL={placeholderImage} // optional blur placeholder
+                onError={(e) => { e.currentTarget.src = placeholderImage; }}
               />
 
-              {posts[0].source && (
+              {posts[0]?.source && (
                 <p className="text-gray-400 text-sm mt-2">Source: {posts[0].source}</p>
               )}
 
               <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">
-                {posts[0].excerpt || posts[0].content || ""}
+                {posts[0]?.excerpt || posts[0]?.content || ""}
               </p>
             </div>
           )}
@@ -85,35 +92,36 @@ export default function Home() {
           <AdBlock />
 
           {/* Other posts/articles */}
-          {posts.slice(1).map((post) => (
-            <div key={post._id || post.slug || Math.random()} className="border-b pb-6">
-              <a
-                href={post.originalUrl || `/articles/${post.slug}`}
-                target={post.originalUrl ? "_blank" : "_self"}
-                rel={post.originalUrl ? "noopener noreferrer" : ""}
-              >
-                <h2 className="text-xl font-bold hover:text-red-600">{post.title}</h2>
-              </a>
+          {posts.slice(1).map((post, index) =>
+            post && typeof post === "object" ? (
+              <div key={post._id || post.slug || index} className="border-b pb-6">
+                <a
+                  href={post?.originalUrl || `/articles/${post?.slug}`}
+                  target={post?.originalUrl ? "_blank" : "_self"}
+                  rel={post?.originalUrl ? "noopener noreferrer" : ""}
+                >
+                  <h2 className="text-xl font-bold hover:text-red-600">
+                    {post?.title || "Untitled"}
+                  </h2>
+                </a>
 
-              <Image
-                src={post.image || placeholderImage}
-                alt={post.title || "News Image"}
-                width={1200}
-                height={400}
-                className="w-full h-[200px] object-cover rounded my-2"
-                placeholder="blur"
-                blurDataURL={placeholderImage}
-              />
+                <img
+                  src={post?.image || placeholderImage}
+                  alt={post?.title || "News Image"}
+                  className="w-full h-[200px] object-cover rounded my-2"
+                  onError={(e) => { e.currentTarget.src = placeholderImage; }}
+                />
 
-              {post.source && (
-                <p className="text-gray-400 text-sm">Source: {post.source}</p>
-              )}
+                {post?.source && (
+                  <p className="text-gray-400 text-sm">Source: {post.source}</p>
+                )}
 
-              <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
-                {post.excerpt || post.content || ""}
-              </p>
-            </div>
-          ))}
+                <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
+                  {post?.excerpt || post?.content || ""}
+                </p>
+              </div>
+            ) : null
+          )}
         </div>
 
         <div className="space-y-6">
