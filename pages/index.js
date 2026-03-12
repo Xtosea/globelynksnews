@@ -5,12 +5,13 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdBlock from "../components/AdBlock";
 import StickyShare from "../components/StickyShare";
+import Image from "next/image"; // <-- use next/image
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
 
   // Placeholder image if article/post has no image
-  const placeholderImage = "/placeholder.png"; // put a placeholder in public folder
+  const placeholderImage = "/placeholder.png"; // make sure this exists in public folder
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -23,7 +24,6 @@ export default function Home() {
         const postData = await postRes.json();
         const articleData = await articleRes.json();
 
-        // Combine both arrays and sort by date descending
         const combined = [...postData, ...articleData].sort((a, b) => {
           const dateA = new Date(a.publishedAt || a.createdAt);
           const dateB = new Date(b.publishedAt || b.createdAt);
@@ -37,7 +37,7 @@ export default function Home() {
     };
 
     fetchPosts();
-    const interval = setInterval(fetchPosts, 30000); // refresh every 30s
+    const interval = setInterval(fetchPosts, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -61,14 +61,17 @@ export default function Home() {
                 </h1>
               </a>
 
-              {/* Image */}
-              <img
+              {/* Image with next/image */}
+              <Image
                 src={posts[0].image || placeholderImage}
                 alt={posts[0].title || "News Image"}
+                width={1200} // adjust width
+                height={600} // adjust height
                 className="w-full h-[400px] object-cover rounded"
+                placeholder="blur"
+                blurDataURL={placeholderImage} // optional blur placeholder
               />
 
-              {/* Source */}
               {posts[0].source && (
                 <p className="text-gray-400 text-sm mt-2">Source: {posts[0].source}</p>
               )}
@@ -92,10 +95,14 @@ export default function Home() {
                 <h2 className="text-xl font-bold hover:text-red-600">{post.title}</h2>
               </a>
 
-              <img
+              <Image
                 src={post.image || placeholderImage}
                 alt={post.title || "News Image"}
+                width={1200}
+                height={400}
                 className="w-full h-[200px] object-cover rounded my-2"
+                placeholder="blur"
+                blurDataURL={placeholderImage}
               />
 
               {post.source && (
