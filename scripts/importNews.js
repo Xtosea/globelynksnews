@@ -1,134 +1,75 @@
 import Parser from "rss-parser";
-import axios from "axios";
-import cheerio from "cheerio";
-import { connectDB } from "../lib/mongodb.js";
-import Article from "../models/Article.js";
+import { connectDB } from "@/lib/mongodb";
+import Article from "@/models/Article";
 
-const parser = new Parser({
-  customFields: {
-    item: [
-      ['media:content', 'mediaContent'],
-      ['media:thumbnail', 'mediaThumbnail'],
-      ['enclosure', 'enclosure']
-    ]
-  }
-});
+const parser = new Parser();
 
 const feeds = [
 
-  // GLOBAL
-  {
-    url: "https://feeds.bbci.co.uk/news/rss.xml",
-    category: "World"
-  },
-  {
-    url: "http://rss.cnn.com/rss/edition.rss",
-    category: "World"
-  },
+  // Nigeria
+  "https://punchng.com/feed/",
+  "https://www.vanguardngr.com/feed/",
+  "https://guardian.ng/feed/",
+  "https://www.channelstv.com/feed/",
 
-  // AFRICA
-  {
-    url: "https://feeds.bbci.co.uk/news/world/africa/rss.xml",
-    category: "Africa"
-  },
-  {
-    url: "https://www.africanews.com/feed/rss",
-    category: "Africa"
-  },
-  {
-    url: "https://allafrica.com/tools/headlines/rdf/latest/headlines.rdf",
-    category: "Africa"
-  },
+  // Africa
+  "https://feeds.bbci.co.uk/news/world/africa/rss.xml",
+  "https://www.africanews.com/feed/rss",
 
-  // NIGERIA
-  {
-    url: "https://www.vanguardngr.com/feed/",
-    category: "Nigeria"
-  },
-  {
-    url: "https://punchng.com/feed/",
-    category: "Nigeria"
-  },
-  {
-    url: "https://guardian.ng/feed/",
-    category: "Nigeria"
-  },
-  {
-    url: "https://www.channelstv.com/feed/",
-    category: "Nigeria"
-  },
-  {
-    url: "https://www.premiumtimesng.com/feed",
-    category: "Nigeria"
-  },
+  // World
+  "https://feeds.bbci.co.uk/news/rss.xml",
+  "http://rss.cnn.com/rss/edition.rss",
 
-  // TECH
-  {
-    url: "https://techcrunch.com/feed/",
-    category: "Technology"
-  }
+  // Tech
+  "https://techcrunch.com/feed/"
 ];
 
-async function getOgImage(url) {
+export async function GET() {
+
   try {
-    const { data } = await axios.get(url, { timeout: 5000 });
-    const $ = cheerio.load(data);
 
-    const og =
-      $('meta[property="og:image"]').attr("content") ||
-      $('meta[name="twitter:image"]').attr("content");
+    await connectDB();
 
-    return og || "";
-  } catch {
-    return "";
-  }
-}
+    let imported = 0;
 
-async function importNews() {
+    for (const feedUrl of feeds) {
 
-  await connectDB();
+      const feed = await parser.parseURL(feedUrl);
 
-  for (const feedSource of feeds) {
+      for (const item of feed.items) {
 
-    console.log("Fetching:", feedSource.url);
+        const exists = await Article.findOne({
+          originalUrl: item.link
+        });
 
-    const feed = await parser.parseURL(feedSource.url);
+        if (exists) continue;
 
-    for (const item of feed.items) {
+        await Article.create({
+          title: item.title,
+          content: item.contentSnippet || "",
+          originalUrl: item.link,
+          source: feed.title,
+          image: item.enclosure?.url || "",
+          type: "rss",
+          publishedAt: item.pubDate || new Date()
+        });
 
-      const exists = await Article.findOne({
-        originalUrl: item.link
-      });
-
-      if (exists) continue;
-
-      let image =
-        item.mediaContent?.url ||
-        item.mediaThumbnail?.url ||
-        item.enclosure?.url ||
-        "";
-
-      if (!image) {
-        image = await getOgImage(item.link);
+        imported++;
       }
-
-      await Article.create({
-        title: item.title,
-        content: item.contentSnippet || "",
-        originalUrl: item.link,
-        source: feed.title,
-        image: image,
-        category: feedSource.category,
-        type: "rss",
-        publishedAt: item.pubDate || new Date(),
-        createdAt: new Date()
-      });
-
-      console.log("Saved:", item.title);
     }
+
+    return Response.json({
+      success: true,
+      imported
+    });
+
+  } catch (error) {
+
+    console.error("Import error:", error);
+
+    return Response.json({
+      success: false,
+      error: error.message
+    });
   }
-
-  console.log("Import finished");
 }
-
-importNews();
