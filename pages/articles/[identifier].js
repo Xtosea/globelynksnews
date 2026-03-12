@@ -1,66 +1,147 @@
-// pages/articles/[identifier].js
+"use client"
 
-import { connectDB } from "@/lib/mongodb"
-import Article from "@/models/Article"
-import mongoose from "mongoose"
+import { useEffect, useState } from "react"
+import Head from "next/head"
 
-export async function getServerSideProps({ params }) {
-  await connectDB()
+export default function PostPage({ post }) {
+  const slug = post.slug
 
-  const { identifier } = params
-  let post = null
+  // --- Views state ---
+  const [views, setViews] = useState(post.views || 0)
 
-  if (mongoose.Types.ObjectId.isValid(identifier)) {
-    post = await Article.findById(identifier).lean()
-  }
+  useEffect(() => {
+    if (!slug) return
 
-  if (!post) {
-    post = await Article.findOne({ slug: identifier }).lean()
-  }
+    fetch(`/api/posts/${slug}/view`, { method: "POST" })
+      .then(res => res.json())
+      .then(data => {
+        if (data.views !== undefined) setViews(data.views)
+      })
+      .catch(err => console.error("Failed to increment view:", err))
+  }, [slug])
 
-  if (!post) {
-    return { notFound: true }
-  }
+  // --- Comments state ---
+  const [comments, setComments] = useState([])
+  const [name, setName] = useState("")
+  const [message, setMessage] = useState("")
 
-  // Redirect RSS articles
-  if (post.type === "rss" && post.originalUrl) {
-    return {
-      redirect: {
-        destination: post.originalUrl,
-        permanent: false,
-      },
+  // Fetch comments on load
+  useEffect(() => {
+    if (!slug) return
+
+    fetch(`/api/comments?slug=${slug}`)
+      .then(res => res.json())
+      .then(data => setComments(data))
+      .catch(err => console.error("Failed to fetch comments:", err))
+  }, [slug])
+
+  // Submit new comment
+  const submitComment = async () => {
+    if (!name || !message) return alert("Please enter your name and message")
+
+    const res = await fetch("/api/comments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postSlug: slug, name, message }),
+    })
+
+    if (res.ok) {
+      const newComment = await res.json()
+      setComments(prev => [...prev, newComment])
+      setName("")
+      setMessage("")
+    } else {
+      alert("Failed to post comment")
     }
   }
 
-  return {
-    props: {
-      post: JSON.parse(JSON.stringify(post)),
-    },
-  }
+  return (
+    <>
+      <Head>
+        <title>{post.title} | Globelynks News</title>
+        <meta name="description" content={post.excerpt} />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:image" content={post.image} />
+        <meta
+          property="og:url"
+          content={`https://trendingnews.globelynks.com/posts/${post.slug}`}
+        />
+        <meta property="og:site_name" content="Globelynks News" />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={post.image} />
+      </Head>
+
+      <article className="max-w-3xl mx-auto px-6 py-10">
+        <h1 className="text-4xl font-bold mb-2">{post.title}</h1>
+
+        <p className="text-sm text-gray-500 mb-2">
+          {post.author} · {new Date(post.publishedAt).toDateString()}
+        </p>
+
+        {/* Views */}
+        <p className="text-sm text-gray-500 mb-6">👁 {views.toLocaleString()} views</p>
+
+        {post.image && (
+          <img src={post.image} alt={post.title} className="w-full rounded-xl mb-8" />
+        )}
+
+        <div className="prose prose-lg max-w-none whitespace-pre-line mb-10">
+          {post.content}
+        </div>
+
+        {/* --- Comments Section --- */}
+        <div className="mt-10">
+          <h3 className="font-bold mb-4">Comments</h3>
+
+          <input
+            placeholder="Your name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            className="border p-2 w-full mb-2"
+          />
+
+          <textarea
+            placeholder="Write comment..."
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            className="border p-2 w-full mb-2"
+          />
+
+          <button
+            onClick={submitComment}
+            className="bg-red-600 text-white px-4 py-2 rounded"
+          >
+            Post Comment
+          </button>
+
+          <div className="mt-6 space-y-4">
+            {comments.map(c => (
+              <div key={c._id} className="border-b pb-2">
+                <p className="font-semibold">{c.name}</p>
+                <p className="text-sm text-gray-600">{c.message}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </article>
+    </>
+  )
 }
 
-export default function ArticlePage({ post }) {
-  return (
-    <div className="max-w-3xl mx-auto px-6 py-10">
-      <h1 className="text-4xl font-extrabold mb-4">{post.title}</h1>
-
-      {post.image && (
-        <img
-          src={post.image}
-          alt={post.title}
-          className="w-full h-[400px] object-cover rounded mb-4"
-        />
-      )}
-
-      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
-        {post.content}
-      </p>
-
-      {post.source && !post.originalUrl && (
-        <p className="mt-4 text-gray-400 text-sm">
-          Source: {post.source}
-        </p>
-      )}
-    </div>
+export async function getServerSideProps({ params }) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SITE_URL}/api/posts/${params.slug}`
   )
+
+  if (!res.ok) return { notFound: true }
+
+  const post = await res.json()
+
+  return { props: { post } }
 }
