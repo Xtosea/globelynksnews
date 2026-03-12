@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
-import { connectDB } from '@/lib/mongodb';
-import Post from "../../../models/Post";
+import { connectDB } from "@/lib/mongodb";
+import Post from "@/models/Post";
 
 export async function GET() {
   try {
     await connectDB();
 
     const posts = await Post.find({})
-      .sort({ publishedAt: -1 });
+      .sort({ publishedAt: -1 })
+      .select("_id slug title excerpt content image category author publishedAt views") // select all needed fields
+      .lean();
 
     return NextResponse.json(posts);
   } catch (err) {
     console.error("GET /api/posts error:", err);
-    return NextResponse.json(
-      { message: "Server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
