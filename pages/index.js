@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"
-import BreakingTicker from "../components/BreakingTicker"
-import TrendingSidebar from "../components/TrendingSidebar"
+
 import AdBlock from "../components/AdBlock"
 import StickyShare from "../components/StickyShare"
 import Link from "next/link"
@@ -30,7 +29,7 @@ export default function Home() {
   return (
     <>
       <Navbar />  
-      <BreakingTicker posts={posts} />
+      
       <StickyShare />
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
         <div className="md:col-span-3 space-y-10">
@@ -54,7 +53,7 @@ export default function Home() {
           ))}
         </div>
         <div className="space-y-6">
-          <TrendingSidebar posts={posts} />
+          
           <AdBlock />
         </div>
       </main>
