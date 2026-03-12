@@ -16,12 +16,13 @@ export default function Home() {
       try {
         const [postRes, articleRes] = await Promise.all([
           fetch("/api/posts"),
-          fetch("/api/articles")
+          fetch("/api/articles"),
         ]);
 
         const postData = await postRes.json();
         const articleData = await articleRes.json();
 
+        // Combine and sort by newest first
         const combined = [...postData, ...articleData].sort((a, b) => {
           const dateA = new Date(a.publishedAt || a.createdAt);
           const dateB = new Date(b.publishedAt || b.createdAt);
@@ -39,7 +40,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const placeholderImage = "https://via.placeholder.com/400x200?text=No+Image";
+  const placeholderImage = "/placeholder.jpg"; // Make sure you have this in /public
 
   return (
     <>
@@ -47,38 +48,37 @@ export default function Home() {
       <StickyShare />
 
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
-        {/* Main content */}
         <div className="md:col-span-3 space-y-10">
-          {posts[0] && (
+          {posts.length > 0 && (
             <div>
-              {/* Top post/article */}
+              {/* Top post or article */}
               <a
-                href={posts[0].originalUrl || `/articles/${posts[0].slug}`}
-                target={posts[0].originalUrl ? "_blank" : "_self"}
-                rel={posts[0].originalUrl ? "noopener noreferrer" : ""}
+                href={posts[0]?.originalUrl || `/articles/${posts[0]?.slug}`}
+                target={posts[0]?.originalUrl ? "_blank" : "_self"}
+                rel={posts[0]?.originalUrl ? "noopener noreferrer" : ""}
               >
                 <h1 className="text-4xl md:text-5xl font-extrabold mb-4 hover:text-red-600">
-                  {posts[0].title}
+                  {posts[0]?.title || "No Title"}
                 </h1>
               </a>
 
-              <div className="relative w-full h-[400px] rounded overflow-hidden">
-                <Image
-                  src={posts[0].image || placeholderImage}
-                  alt={posts[0].title}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  priority
-                  loading="eager" // top post loads immediately
-                />
-              </div>
+              <Image
+                src={posts[0]?.image || placeholderImage}
+                alt={posts[0]?.title || "News Image"}
+                width={800}
+                height={400}
+                className="w-full h-[400px] object-cover rounded"
+                unoptimized
+              />
 
-              {posts[0].source && (
-                <p className="text-gray-400 text-sm mt-2">Source: {posts[0].source}</p>
+              {posts[0]?.source && (
+                <p className="text-gray-400 text-sm mt-2">
+                  Source: {posts[0]?.source}
+                </p>
               )}
 
               <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">
-                {posts[0].excerpt || posts[0].content}
+                {posts[0]?.excerpt || posts[0]?.content || "No description available."}
               </p>
             </div>
           )}
@@ -86,37 +86,37 @@ export default function Home() {
           <AdBlock />
 
           {posts.slice(1).map((post) => (
-            <div key={post._id} className="border-b pb-6">
+            <div key={post._id || post.slug} className="border-b pb-6">
               <a
-                href={post.originalUrl || `/articles/${post.slug}`}
-                target={post.originalUrl ? "_blank" : "_self"}
-                rel={post.originalUrl ? "noopener noreferrer" : ""}
+                href={post?.originalUrl || `/articles/${post?.slug}`}
+                target={post?.originalUrl ? "_blank" : "_self"}
+                rel={post?.originalUrl ? "noopener noreferrer" : ""}
               >
-                <h2 className="text-xl font-bold hover:text-red-600">{post.title}</h2>
+                <h2 className="text-xl font-bold hover:text-red-600">
+                  {post?.title || "No Title"}
+                </h2>
               </a>
 
-              <div className="relative w-full h-[200px] rounded overflow-hidden my-2">
-                <Image
-                  src={post.image || placeholderImage}
-                  alt={post.title}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  loading="lazy" // lazy load all other images
-                />
-              </div>
+              <Image
+                src={post?.image || placeholderImage}
+                alt={post?.title || "News Image"}
+                width={600}
+                height={200}
+                className="w-full h-[200px] object-cover rounded my-2"
+                unoptimized
+              />
 
-              {post.source && (
+              {post?.source && (
                 <p className="text-gray-400 text-sm">Source: {post.source}</p>
               )}
 
               <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
-                {post.excerpt || post.content}
+                {post?.excerpt || post?.content || "No description available."}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
           <AdBlock />
         </div>
