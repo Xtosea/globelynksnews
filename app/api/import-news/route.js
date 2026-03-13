@@ -1,34 +1,86 @@
-Running build in Washington, D.C., USA (East) – iad1
-Build machine configuration: 2 cores, 8 GB
-Cloning github.com/Xtosea/globelynksnews (Branch: main, Commit: 5b855cb)
-Cloning completed: 293.000ms
-Restored build cache from previous deployment (BpJxtH5MwtVJSQJ7imz7b4B8V1wq)
-Warning: Detected "engines": { "node": ">=20.x" } in your `package.json` that will automatically upgrade when a new major Node.js Version is released. Learn More: https://vercel.link/node-version
-Running "vercel build"
-Vercel CLI 50.32.4
-Warning: Detected "engines": { "node": ">=20.x" } in your `package.json` that will automatically upgrade when a new major Node.js Version is released. Learn More: https://vercel.link/node-version
-Installing dependencies...
+import mongoose from "mongoose";
+import Parser from "rss-parser";
+import * as cheerio from "cheerio";
+import slugify from "slugify";
+import Article from "@/models/Article";
+import { cacheImage } from "@/utils/cacheImage";
 
-added 1 package in 12s
+const parser = new Parser();
+const DEFAULT_IMAGE = "https://trendingnews.globelynks.com/no-image.jpg";
 
-268 packages are looking for funding
-  run `npm fund` for details
-Detected Next.js version: 15.5.9
-Running "npm run build"
+// Connect to MongoDB
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) throw new Error("MONGODB_URI not set");
 
-> build
-> next build
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-   ▲ Next.js 15.5.9
+// Helper: extract image from RSS item
+function extractImage(item) {
+  if (item.enclosure?.url) return item.enclosure.url;
+  if (item["media:content"]?.url) return item["media:content"].url;
+  if (item["media:thumbnail"]?.url) return item["media:thumbnail"].url;
 
-   Creating an optimized production build ...
-Failed to compile.
+  if (item.content || item.contentSnippet) {
+    const html = item.content || item.contentSnippet;
+    const $ = cheerio.load(html);
+    const img = $("img").first().attr("src");
+    if (img) return img;
+  }
 
-./app/api/import-news/route.js
-Module not found: Can't resolve 'node-fetch'
+  return DEFAULT_IMAGE;
+}
 
-https://nextjs.org/docs/messages/module-not-found
+// RSS feeds
+const feeds = [
+  { url: "https://rss.cnn.com/rss/edition.rss", category: "World" },
+  { url: "https://feeds.bbci.co.uk/news/world/rss.xml", category: "World" },
+  { url: "https://www.punchng.com/feed/", category: "Nigeria" },
+];
 
+// API Handler
+export async function GET(req) {
+  try {
+    let imported = 0;
 
-> Build failed because of webpack errors
-Error: Command "npm run build" exited with 1
+    for (const feedInfo of feeds) {
+      const feed = await parser.parseURL(feedInfo.url);
+
+      for (const item of feed.items) {
+        const slug = slugify(item.title || "", { lower: true, strict: true });
+        const exists = await Article.findOne({ slug });
+        if (exists) continue;
+
+        // Get image & cache locally
+        let image = extractImage(item);
+        const cachedUrl = await cacheImage(image, slug);
+        image = cachedUrl || DEFAULT_IMAGE;
+
+        await Article.create({
+          title: item.title,
+          content: item.contentSnippet || "",
+          image,
+          originalUrl: item.link,
+          source: feed.title,
+          slug,
+          category: feedInfo.category,
+          publishedAt: item.pubDate || new Date(),
+        });
+
+        imported++;
+      }
+    }
+
+    return new Response(
+      JSON.stringify({ success: true, message: `${imported} articles imported` }),
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error("Import News Error:", err);
+    return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500 });
+  } finally {
+    mongoose.disconnect();
+  }
+}
