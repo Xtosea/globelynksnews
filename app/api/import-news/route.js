@@ -1,7 +1,7 @@
 import Parser from "rss-parser";
 import axios from "axios";
 import * as cheerio from "cheerio";
-import Article from "../models/Article.js";
+import Article from "@/models/Article.js";
 
 const parser = new Parser();
 
