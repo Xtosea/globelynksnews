@@ -62,10 +62,9 @@ export default function Home() {
               </a>
 
               {/* Top image */}
-              <div
-            <div
+<div
   className="w-full relative rounded overflow-hidden bg-gray-200"
-  style={{ paddingTop: "56.25%" }} // 16:9 aspect ratio
+  style={{ paddingTop: "56.25%" }}
 >
   <img
     src={posts[0].image || placeholderImage}
@@ -104,10 +103,9 @@ export default function Home() {
               </a>
 
               {/* Other images */}
-              <div
-            <div
+<div
   className="w-full relative rounded overflow-hidden bg-gray-200 my-2"
-  style={{ paddingTop: "50%" }} // 2:1 aspect ratio
+  style={{ paddingTop: "50%" }}
 >
   <img
     src={post.image || placeholderImage}
