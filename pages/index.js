@@ -35,6 +35,7 @@ export default function Home() {
     };
 
     fetchPosts();
+
     const interval = setInterval(fetchPosts, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -45,6 +46,8 @@ export default function Home() {
       <StickyShare />
 
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
+
+        {/* MAIN NEWS COLUMN */}
         <div className="md:col-span-3 space-y-10">
 
           {/* TOP ARTICLE */}
@@ -65,6 +68,10 @@ export default function Home() {
                 <img
                   src={posts[0].image || placeholderImage}
                   alt={posts[0].title}
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = placeholderImage;
+                  }}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
@@ -83,12 +90,10 @@ export default function Home() {
 
           <AdBlock />
 
-          {/* OTHER POSTS */}
+          {/* OTHER ARTICLES */}
           {posts.slice(1).map((post) => (
-            <div
-              key={post._id || post.slug}
-              className="border-b pb-6"
-            >
+            <div key={post._id || post.slug} className="border-b pb-6">
+
               <a
                 href={post.originalUrl || `/articles/${post.slug}`}
                 target={post.originalUrl ? "_blank" : "_self"}
@@ -104,6 +109,10 @@ export default function Home() {
                 <img
                   src={post.image || placeholderImage}
                   alt={post.title}
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = placeholderImage;
+                  }}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
@@ -126,6 +135,7 @@ export default function Home() {
         <div className="space-y-6">
           <AdBlock />
         </div>
+
       </main>
 
       <Footer />
