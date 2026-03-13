@@ -63,16 +63,19 @@ export default function Home() {
 
               {/* Top image */}
               <div
-                className="w-full relative rounded overflow-hidden"
-                style={{ paddingTop: "56.25%" }} // 16:9 aspect
-              >
-                <img
-                  src={posts[0].image || placeholderImage}
-                  alt={posts[0].title || "News Image"}
-                  className="absolute top-0 left-0 w-full h-full object-cover"
-                  onError={(e) => (e.currentTarget.src = placeholderImage)}
-                />
-              </div>
+            <div
+  className="w-full relative rounded overflow-hidden bg-gray-200"
+  style={{ paddingTop: "56.25%" }} // 16:9 aspect ratio
+>
+  <img
+    src={posts[0].image || placeholderImage}
+    alt={posts[0].title || "News Image"}
+    loading="eager"
+    decoding="async"
+    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+    onError={(e) => (e.currentTarget.src = placeholderImage)}
+  />
+</div>
 
               {posts[0].source && (
                 <p className="text-gray-400 text-sm mt-2">Source: {posts[0].source}</p>
@@ -102,16 +105,19 @@ export default function Home() {
 
               {/* Other images */}
               <div
-                className="w-full relative rounded overflow-hidden my-2"
-                style={{ paddingTop: "50%" }} // 2:1 aspect
-              >
-                <img
-                  src={post.image || placeholderImage}
-                  alt={post.title || "News Image"}
-                  className="absolute top-0 left-0 w-full h-full object-cover"
-                  onError={(e) => (e.currentTarget.src = placeholderImage)}
-                />
-              </div>
+            <div
+  className="w-full relative rounded overflow-hidden bg-gray-200 my-2"
+  style={{ paddingTop: "50%" }} // 2:1 aspect ratio
+>
+  <img
+    src={post.image || placeholderImage}
+    alt={post.title || "News Image"}
+    loading="lazy"
+    decoding="async"
+    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+    onError={(e) => (e.currentTarget.src = placeholderImage)}
+  />
+</div>
 
               {post.source && (
                 <p className="text-gray-400 text-sm">Source: {post.source}</p>
