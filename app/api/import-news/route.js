@@ -19,20 +19,29 @@ mongoose.connect(MONGODB_URI, {
 
 // Helper: extract image from RSS item
 function extractImage(item) {
+
   if (item.enclosure?.url) return item.enclosure.url;
+
   if (item["media:content"]?.url) return item["media:content"].url;
+
   if (item["media:thumbnail"]?.url) return item["media:thumbnail"].url;
 
-  if (item.content || item.contentSnippet) {
-    const html = item.content || item.contentSnippet;
-    const $ = cheerio.load(html);
+  // Try scraping image from content
+  if (item.content) {
+    const $ = cheerio.load(item.content);
+    const img = $("img").first().attr("src");
+    if (img) return img;
+  }
+
+  // Try scraping from summary
+  if (item.contentSnippet) {
+    const $ = cheerio.load(item.contentSnippet);
     const img = $("img").first().attr("src");
     if (img) return img;
   }
 
   return DEFAULT_IMAGE;
 }
-
 // RSS feeds
 const feeds = [
   { url: "https://rss.cnn.com/rss/edition.rss", category: "World" },
