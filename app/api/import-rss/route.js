@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import RSSParser from "rss-parser";
 import { connectDB } from "@/lib/mongodb";
 import Article from "@/models/Article";
-import * as cheerio from "cheerio";
 
 const RSS_FEEDS = [
   { url: "https://techcrunch.com/feed/", source: "TechCrunch" },
