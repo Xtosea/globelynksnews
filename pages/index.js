@@ -64,17 +64,17 @@ export default function Home() {
               </a>
 
               {/* TOP IMAGE */}
-              <div className="relative w-full aspect-video rounded overflow-hidden bg-gray-200 my-2">
-                <img
-                  src={posts[0].image || placeholderImage}
-                  alt={posts[0].title}
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.src = placeholderImage;
-                  }}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
+              <div className="w-full aspect-video rounded overflow-hidden bg-gray-200">
+  <img
+    src={posts[0].image || "/placeholder.png"}
+    alt={posts[0].title}
+    loading="lazy"
+    onError={(e) => {
+      e.currentTarget.src = "/placeholder.png";
+    }}
+    className="w-full h-full object-cover"
+  />
+</div>
 
               {posts[0].source && (
                 <p className="text-gray-400 text-sm mt-2">
@@ -105,17 +105,17 @@ export default function Home() {
               </a>
 
               {/* ARTICLE IMAGE */}
-              <div className="relative w-full aspect-video rounded overflow-hidden bg-gray-200 my-2">
-                <img
-                  src={post.image || placeholderImage}
-                  alt={post.title}
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.src = placeholderImage;
-                  }}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
+              <div className="w-full aspect-video rounded overflow-hidden bg-gray-200">
+  <img
+    src={posts[0].image || "/placeholder.png"}
+    alt={posts[0].title}
+    loading="lazy"
+    onError={(e) => {
+      e.currentTarget.src = "/placeholder.png";
+    }}
+    className="w-full h-full object-cover"
+  />
+</div>
 
               {post.source && (
                 <p className="text-gray-400 text-sm">
