@@ -68,7 +68,7 @@ export default function Home() {
   style={{ paddingTop: "56.25%" }}
 >
   <StableImage
-    src={posts[0].image}
+    src={posts[0]?.image || placeholderImage}
     alt={posts[0].title}
     placeholder={placeholderImage}
   />
@@ -106,7 +106,7 @@ export default function Home() {
   style={{ paddingTop: "50%" }}
 >
   <StableImage
-    src={post.image}
+    src={post?.image || placeholderImage}
     alt={post.title}
     placeholder={placeholderImage}
   />
