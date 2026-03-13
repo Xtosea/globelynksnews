@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import Parser from "rss-parser";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 import slugify from "slugify";
-import Article from "../models/Article.js";
+import Article from "@/models/Article";
 
 const parser = new Parser();
 const DEFAULT_IMAGE = "https://trendingnews.globelynks.com/no-image.jpg";
