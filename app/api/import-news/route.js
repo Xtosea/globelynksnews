@@ -20,11 +20,7 @@ let isConnected = false;
 async function connectDB() {
   if (isConnected) return;
 
-  await mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-
+  await mongoose.connect(MONGODB_URI);
   isConnected = true;
 }
 
