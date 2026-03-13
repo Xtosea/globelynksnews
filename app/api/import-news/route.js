@@ -5,35 +5,43 @@ import slugify from "slugify";
 import Article from "@/models/Article";
 import { cacheImage } from "@/utils/cacheImage";
 
-const parser = new Parser();
 const DEFAULT_IMAGE = "https://trendingnews.globelynks.com/no-image.jpg";
 
-// Connect to MongoDB
+const parser = new Parser({
+  timeout: 10000,
+});
+
+// MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) throw new Error("MONGODB_URI not set");
 
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+let isConnected = false;
 
-// Helper: extract image from RSS item
+async function connectDB() {
+  if (isConnected) return;
+
+  await mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
+  isConnected = true;
+}
+
+// Extract image from RSS item
 function extractImage(item) {
-
   if (item.enclosure?.url) return item.enclosure.url;
 
   if (item["media:content"]?.url) return item["media:content"].url;
 
   if (item["media:thumbnail"]?.url) return item["media:thumbnail"].url;
 
-  // Try scraping image from content
   if (item.content) {
     const $ = cheerio.load(item.content);
     const img = $("img").first().attr("src");
     if (img) return img;
   }
 
-  // Try scraping from summary
   if (item.contentSnippet) {
     const $ = cheerio.load(item.contentSnippet);
     const img = $("img").first().attr("src");
@@ -42,54 +50,80 @@ function extractImage(item) {
 
   return DEFAULT_IMAGE;
 }
+
 // RSS feeds
 const feeds = [
   { url: "https://rss.cnn.com/rss/edition.rss", category: "World" },
   { url: "https://feeds.bbci.co.uk/news/world/rss.xml", category: "World" },
   { url: "https://www.punchng.com/feed/", category: "Nigeria" },
+  { url: "https://www.vanguardngr.com/feed/", category: "Nigeria" },
 ];
 
-// API Handler
-export async function GET(req) {
+// API handler
+export async function GET() {
   try {
+    await connectDB();
+
     let imported = 0;
 
     for (const feedInfo of feeds) {
-      const feed = await parser.parseURL(feedInfo.url);
+      try {
+        const feed = await parser.parseURL(feedInfo.url);
 
-      for (const item of feed.items) {
-        const slug = slugify(item.title || "", { lower: true, strict: true });
-        const exists = await Article.findOne({ slug });
-        if (exists) continue;
+        for (const item of feed.items) {
+          if (!item.title) continue;
 
-        // Get image & cache locally
-        let image = extractImage(item);
-        const cachedUrl = await cacheImage(image, slug);
-        image = cachedUrl || DEFAULT_IMAGE;
+          const slug = slugify(item.title, { lower: true, strict: true });
 
-        await Article.create({
-          title: item.title,
-          content: item.contentSnippet || "",
-          image,
-          originalUrl: item.link,
-          source: feed.title,
-          slug,
-          category: feedInfo.category,
-          publishedAt: item.pubDate || new Date(),
-        });
+          const exists = await Article.findOne({ slug });
+          if (exists) continue;
 
-        imported++;
+          let image = extractImage(item);
+
+          // Cache image locally
+          try {
+            const cached = await cacheImage(image, slug);
+            if (cached) image = cached;
+          } catch {
+            image = DEFAULT_IMAGE;
+          }
+
+          await Article.create({
+            title: item.title,
+            content: item.contentSnippet || "",
+            image,
+            originalUrl: item.link,
+            source: feed.title || "RSS Feed",
+            slug,
+            category: feedInfo.category,
+            publishedAt: item.pubDate || new Date(),
+          });
+
+          imported++;
+        }
+
+      } catch (feedError) {
+        console.log("Feed failed:", feedInfo.url);
       }
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: `${imported} articles imported` }),
+      JSON.stringify({
+        success: true,
+        message: `${imported} articles imported`,
+      }),
       { status: 200 }
     );
-  } catch (err) {
-    console.error("Import News Error:", err);
-    return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500 });
-  } finally {
-    mongoose.disconnect();
+
+  } catch (error) {
+    console.error("Import News Error:", error);
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      { status: 500 }
+    );
   }
 }
