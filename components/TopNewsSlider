@@ -1,0 +1,55 @@
+"use client";
+
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Navigation, Pagination, Autoplay } from "swiper";
+
+export default function TopNewsSlider({ posts }) {
+  if (!posts || posts.length === 0) return null;
+
+  // Take latest 3 foreign + 3 Africa/Nigeria
+  const foreignTop = posts.foreign?.slice(0, 3) || [];
+  const africaTop = posts.africa?.slice(0, 3) || [];
+  const topPosts = [...foreignTop, ...africaTop];
+
+  return (
+    <div className="max-w-7xl mx-auto mb-10">
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay]}
+        navigation
+        pagination={{ clickable: true }}
+        autoplay={{ delay: 5000 }}
+        spaceBetween={20}
+        slidesPerView={1}
+        loop
+      >
+        {topPosts.map((post) => (
+          <SwiperSlide key={post._id || post.slug}>
+            <a
+              href={post.originalUrl || `/articles/${post.slug}`}
+              target={post.originalUrl ? "_blank" : "_self"}
+              rel={post.originalUrl ? "noopener noreferrer" : ""}
+              className="block relative h-64 md:h-96 rounded overflow-hidden shadow-lg"
+            >
+              <img
+                src={post.image || "/placeholder.png"}
+                alt={post.title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 p-4">
+                <h2 className="text-white text-lg md:text-2xl font-bold">
+                  {post.title}
+                </h2>
+                {post.source && (
+                  <p className="text-gray-200 text-sm mt-1">{post.source}</p>
+                )}
+              </div>
+            </a>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
+  );
+}
