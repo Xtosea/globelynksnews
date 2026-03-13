@@ -5,12 +5,10 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdBlock from "../components/AdBlock";
 import StickyShare from "../components/StickyShare";
-import StableImage from "../components/StableImage";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
 
-  // Placeholder image in /public
   const placeholderImage = "/placeholder.png";
 
   useEffect(() => {
@@ -24,7 +22,6 @@ export default function Home() {
         const postData = await postRes.json();
         const articleData = await articleRes.json();
 
-        // Combine and sort newest first
         const combined = [...postData, ...articleData].sort((a, b) => {
           const dateA = new Date(a.publishedAt || a.createdAt);
           const dateB = new Date(b.publishedAt || b.createdAt);
@@ -49,9 +46,10 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
         <div className="md:col-span-3 space-y-10">
+
+          {/* TOP ARTICLE */}
           {posts[0] && (
             <div>
-              {/* Top post/article */}
               <a
                 href={posts[0].originalUrl || `/articles/${posts[0].slug}`}
                 target={posts[0].originalUrl ? "_blank" : "_self"}
@@ -62,20 +60,19 @@ export default function Home() {
                 </h1>
               </a>
 
-              {/* Top image */}
-<div
-  className="w-full relative rounded overflow-hidden bg-gray-200"
-  style={{ paddingTop: "56.25%" }}
->
-  <StableImage
-    src={posts[0]?.image || placeholderImage}
-    alt={posts[0].title}
-    placeholder={placeholderImage}
-  />
-</div>
+              {/* TOP IMAGE */}
+              <div className="relative w-full aspect-video rounded overflow-hidden bg-gray-200 my-2">
+                <img
+                  src={posts[0].image || placeholderImage}
+                  alt={posts[0].title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
 
               {posts[0].source && (
-                <p className="text-gray-400 text-sm mt-2">Source: {posts[0].source}</p>
+                <p className="text-gray-400 text-sm mt-2">
+                  Source: {posts[0].source}
+                </p>
               )}
 
               <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">
@@ -86,10 +83,10 @@ export default function Home() {
 
           <AdBlock />
 
-          {/* Other posts/articles */}
+          {/* OTHER POSTS */}
           {posts.slice(1).map((post) => (
             <div
-              key={post._id || post.slug || Math.random()}
+              key={post._id || post.slug}
               className="border-b pb-6"
             >
               <a
@@ -97,23 +94,24 @@ export default function Home() {
                 target={post.originalUrl ? "_blank" : "_self"}
                 rel={post.originalUrl ? "noopener noreferrer" : ""}
               >
-                <h2 className="text-xl font-bold hover:text-red-600">{post.title}</h2>
+                <h2 className="text-xl font-bold hover:text-red-600">
+                  {post.title}
+                </h2>
               </a>
 
-              {/* Other images */}
-<div
-  className="w-full relative rounded overflow-hidden bg-gray-200 my-2"
-  style={{ paddingTop: "50%" }}
->
-  <StableImage
-    src={post?.image || placeholderImage}
-    alt={post.title}
-    placeholder={placeholderImage}
-  />
-</div>
+              {/* ARTICLE IMAGE */}
+              <div className="relative w-full aspect-video rounded overflow-hidden bg-gray-200 my-2">
+                <img
+                  src={post.image || placeholderImage}
+                  alt={post.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
 
               {post.source && (
-                <p className="text-gray-400 text-sm">Source: {post.source}</p>
+                <p className="text-gray-400 text-sm">
+                  Source: {post.source}
+                </p>
               )}
 
               <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">
@@ -121,8 +119,10 @@ export default function Home() {
               </p>
             </div>
           ))}
+
         </div>
 
+        {/* SIDEBAR */}
         <div className="space-y-6">
           <AdBlock />
         </div>
