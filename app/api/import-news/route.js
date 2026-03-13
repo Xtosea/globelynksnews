@@ -1,125 +1,70 @@
-import mongoose from "mongoose";
 import Parser from "rss-parser";
+import axios from "axios";
 import * as cheerio from "cheerio";
-import slugify from "slugify";
-import Article from "@/models/Article";
-import { cacheImage } from "@/utils/cacheImage";
+import Article from "../models/Article.js";
+
+const parser = new Parser();
 
 const DEFAULT_IMAGE = "https://trendingnews.globelynks.com/no-image.jpg";
 
-const parser = new Parser({
-  timeout: 10000,
-});
-
-// MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URI;
-if (!MONGODB_URI) throw new Error("MONGODB_URI not set");
-
-let isConnected = false;
-
-async function connectDB() {
-  if (isConnected) return;
-
-  await mongoose.connect(MONGODB_URI);
-  isConnected = true;
-}
-
-// Extract image from RSS item
-function extractImage(item) {
-  if (item.enclosure?.url) return item.enclosure.url;
-
-  if (item["media:content"]?.url) return item["media:content"].url;
-
-  if (item["media:thumbnail"]?.url) return item["media:thumbnail"].url;
-
-  if (item.content) {
-    const $ = cheerio.load(item.content);
-    const img = $("img").first().attr("src");
-    if (img) return img;
-  }
-
-  if (item.contentSnippet) {
-    const $ = cheerio.load(item.contentSnippet);
-    const img = $("img").first().attr("src");
-    if (img) return img;
-  }
-
-  return DEFAULT_IMAGE;
-}
-
-// RSS feeds
 const feeds = [
-  { url: "https://rss.cnn.com/rss/edition.rss", category: "World" },
-  { url: "https://feeds.bbci.co.uk/news/world/rss.xml", category: "World" },
-  { url: "https://www.punchng.com/feed/", category: "Nigeria" },
-  { url: "https://www.vanguardngr.com/feed/", category: "Nigeria" },
+  { url: "https://feeds.bbci.co.uk/news/rss.xml", source: "BBC News" },
+  { url: "https://www.vanguardngr.com/feed/", source: "Vanguard News" },
 ];
 
-// API handler
-export async function GET() {
+async function extractImageFromArticle(url) {
   try {
-    await connectDB();
+    const { data } = await axios.get(url, { timeout: 8000 });
 
-    let imported = 0;
+    const $ = cheerio.load(data);
 
-    for (const feedInfo of feeds) {
-      try {
-        const feed = await parser.parseURL(feedInfo.url);
+    const img =
+      $('meta[property="og:image"]').attr("content") ||
+      $("article img").first().attr("src") ||
+      $("img").first().attr("src");
 
-        for (const item of feed.items) {
-          if (!item.title) continue;
+    return img || DEFAULT_IMAGE;
+  } catch (err) {
+    return DEFAULT_IMAGE;
+  }
+}
 
-          const slug = slugify(item.title, { lower: true, strict: true });
+export async function importRSS() {
+  for (const feed of feeds) {
+    try {
+      const parsed = await parser.parseURL(feed.url);
 
-          const exists = await Article.findOne({ slug });
-          if (exists) continue;
+      for (const item of parsed.items) {
+        const exists = await Article.findOne({
+          originalUrl: item.link,
+        });
 
-          let image = extractImage(item);
+        if (exists) continue;
 
-          // Cache image locally
-          try {
-            const cached = await cacheImage(image, slug);
-            if (cached) image = cached;
-          } catch {
-            image = DEFAULT_IMAGE;
-          }
+        let image =
+          item.enclosure?.url ||
+          item["media:content"]?.url ||
+          item["media:thumbnail"]?.url ||
+          null;
 
-          await Article.create({
-            title: item.title,
-            content: item.contentSnippet || "",
-            image,
-            originalUrl: item.link,
-            source: feed.title || "RSS Feed",
-            slug,
-            category: feedInfo.category,
-            publishedAt: item.pubDate || new Date(),
-          });
-
-          imported++;
+        if (!image) {
+          image = await extractImageFromArticle(item.link);
         }
 
-      } catch (feedError) {
-        console.log("Feed failed:", feedInfo.url);
+        const article = new Article({
+          title: item.title,
+          content: item.contentSnippet || item.content || "",
+          image: image || DEFAULT_IMAGE,
+          source: feed.source,
+          originalUrl: item.link,
+          type: "rss",
+          publishedAt: item.pubDate || new Date(),
+        });
+
+        await article.save();
       }
+    } catch (err) {
+      console.error("RSS error:", err.message);
     }
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: `${imported} articles imported`,
-      }),
-      { status: 200 }
-    );
-
-  } catch (error) {
-    console.error("Import News Error:", error);
-
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error.message,
-      }),
-      { status: 500 }
-    );
   }
 }
