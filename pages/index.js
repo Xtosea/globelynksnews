@@ -107,8 +107,8 @@ export default function Home() {
               {/* ARTICLE IMAGE */}
               <div className="w-full aspect-video rounded overflow-hidden bg-gray-200">
   <img
-    src={posts[0].image || "/placeholder.png"}
-    alt={posts[0].title}
+    src={post.image || "/placeholder.png"}
+    alt={post.title}
     loading="lazy"
     onError={(e) => {
       e.currentTarget.src = "/placeholder.png";
