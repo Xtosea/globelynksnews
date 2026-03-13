@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdBlock from "../components/AdBlock";
 import StickyShare from "../components/StickyShare";
+import StableImage from "../components/StableImage";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -66,13 +67,10 @@ export default function Home() {
   className="w-full relative rounded overflow-hidden bg-gray-200"
   style={{ paddingTop: "56.25%" }}
 >
-  <img
-    src={posts[0].image || placeholderImage}
-    alt={posts[0].title || "News Image"}
-    loading="eager"
-    decoding="async"
-    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-    onError={(e) => (e.currentTarget.src = placeholderImage)}
+  <StableImage
+    src={posts[0].image}
+    alt={posts[0].title}
+    placeholder={placeholderImage}
   />
 </div>
 
@@ -107,13 +105,10 @@ export default function Home() {
   className="w-full relative rounded overflow-hidden bg-gray-200 my-2"
   style={{ paddingTop: "50%" }}
 >
-  <img
-    src={post.image || placeholderImage}
-    alt={post.title || "News Image"}
-    loading="lazy"
-    decoding="async"
-    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-    onError={(e) => (e.currentTarget.src = placeholderImage)}
+  <StableImage
+    src={post.image}
+    alt={post.title}
+    placeholder={placeholderImage}
   />
 </div>
 
