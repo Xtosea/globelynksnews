@@ -6,7 +6,7 @@ export default function Footer() {
 
    <SpeedInsights/>
 
-      © {new Date().getFullYear()} Powered by Board Givers International Multipurpose Limited. All rights reserved
+      © {new Date().getFullYear()} Powered by Board Givers International Multipurpos Limited. All rights reserved
     </footer>
   )
 }
