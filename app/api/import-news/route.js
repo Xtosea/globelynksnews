@@ -1,6 +1,6 @@
 import Parser from "rss-parser";
 import * as cheerio from "cheerio";
-import connectDB from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 import Article from "@/models/Article";
 
 const parser = new Parser();
