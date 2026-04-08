@@ -4,8 +4,13 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       <Head>
-        {/* Tailwind CDN */}
-        <script>(function(s){s.dataset.zone='10851618',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+
+        {/* Monetad Script */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(s){s.dataset.zone='10851618',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`
+          }}
+        />
 
         {/* Tailwind Config */}
         <script
@@ -28,6 +33,7 @@ export default function App({ Component, pageProps }) {
         <meta property="og:type" content="article" />
         <meta property="og:site_name" content="Globelynks Blog" />
         <meta name="twitter:card" content="summary_large_image" />
+
       </Head>
 
       <Component {...pageProps} />
