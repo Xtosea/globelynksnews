@@ -5,6 +5,9 @@ export default function App({ Component, pageProps }) {
     <>
       <Head>
 
+        {/* Tailwind CDN (IMPORTANT - restore this) */}
+        <script src="https://cdn.tailwindcss.com"></script>
+
         {/* Monetad Script */}
         <script
           dangerouslySetInnerHTML={{
