@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Script from "next/script";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdBlock from "../components/AdBlock";
@@ -42,15 +42,6 @@ export default function Home() {
   }, []);
 
   return (
-   
-  <>
-  <Script
-    src="https://5gvci.com/act/files/tag.min.js?z=10851573"
-    strategy="afterInteractive"
-    data-cfasync="false"
-  />
-
-  <Navbar />
    
    <>
     <Navbar />
