@@ -5,14 +5,7 @@ export default function App({ Component, pageProps }) {
     <>
       <Head>
         {/* Tailwind CDN */}
-        <script src="https://cdn.tailwindcss.com"></script>
-
-        {/* Monetad Ad Script */}
-        <script
-          src="https://5gvci.com/act/files/tag.min.js?z=10851573"
-          data-cfasync="false"
-          async
-        ></script>
+        <script>(function(s){s.dataset.zone='10851618',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
         {/* Tailwind Config */}
         <script
