@@ -6,7 +6,7 @@ import Article from "@/models/Article";
 const parser = new Parser();
 const DEFAULT_IMAGE = "https://trendingnews.globelynks.com/no-image.jpg";
 
-// Popular news feeds with images
+// Popular news feeds
 const feeds = [
   { url: "https://feeds.bbci.co.uk/news/rss.xml", source: "BBC News" },
   { url: "https://www.vanguardngr.com/feed/", source: "Vanguard News" },
@@ -18,23 +18,25 @@ const feeds = [
   { url: "https://www.reutersagency.com/feed/?best-topics=top-news", source: "Reuters" },
 ];
 
+// Extract largest/first meaningful image from article page
 async function extractImageFromArticle(url) {
   try {
-    const res = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
+    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    const img =
-      $('meta[property="og:image"]').attr("content") ||         // OpenGraph
-      $('meta[name="twitter:image"]').attr("content") ||        // Twitter card
-      $("article img").first().attr("src") ||                  // Article images
-      $("figure img").first().attr("src") ||                   // Figure images
-      $(".td-post-featured-image img").first().attr("src") ||  // Vanguard-specific
-      $("img").first().attr("src");                             // Fallback
+    // Collect candidate images
+    const candidates = [
+      $('meta[property="og:image"]').attr("content"),
+      $('meta[name="twitter:image"]').attr("content"),
+      $("article img").map((i, el) => $(el).attr("src")).get(),
+      $("figure img").map((i, el) => $(el).attr("src")).get(),
+      $(".td-post-featured-image img").map((i, el) => $(el).attr("src")).get(),
+      $("img").map((i, el) => $(el).attr("src")).get(),
+    ].flat().filter(Boolean);
 
-    return img || DEFAULT_IMAGE;
+    // Optional: pick largest by fetching width/height (if needed)
+    return candidates[0] || DEFAULT_IMAGE;
   } catch (err) {
     console.log("Image extraction failed:", url, err.message);
     return DEFAULT_IMAGE;
@@ -51,21 +53,20 @@ export async function GET() {
         const parsed = await parser.parseURL(feed.url);
 
         for (const item of parsed.items) {
-          // Skip if article already exists
-          const exists = await Article.findOne({ originalUrl: item.link });
+          // Deduplicate by URL or title
+          const exists = await Article.findOne({
+            $or: [{ originalUrl: item.link }, { title: item.title }],
+          });
           if (exists) continue;
 
-          // Attempt to get image from feed first
+          // Feed image or extract from page
           let image =
             item.enclosure?.url ||
             item["media:content"]?.url ||
             item["media:thumbnail"]?.url ||
             null;
 
-          // If feed doesn't provide image, extract from article page
-          if (!image) {
-            image = await extractImageFromArticle(item.link);
-          }
+          if (!image) image = await extractImageFromArticle(item.link);
 
           await Article.create({
             title: item.title,
@@ -75,6 +76,7 @@ export async function GET() {
             originalUrl: item.link,
             type: "rss",
             publishedAt: item.pubDate ? new Date(item.pubDate) : new Date(),
+            categories: item.categories || [],
           });
 
           imported++;
