@@ -7,6 +7,13 @@ export default function App({ Component, pageProps }) {
         {/* Tailwind CDN */}
         <script src="https://cdn.tailwindcss.com"></script>
 
+        {/* Monetad Ad Script */}
+        <script
+          src="https://5gvci.com/act/files/tag.min.js?z=10851573"
+          data-cfasync="false"
+          async
+        ></script>
+
         {/* Tailwind Config */}
         <script
           dangerouslySetInnerHTML={{
