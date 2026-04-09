@@ -10,8 +10,8 @@ import AdcashVideoSlider from "../components/AdcashVideoSlider";
 import Link from "next/link";
 import SocialShare from "../components/SocialShare";
 import AdcashDisplayBanner from "@/components/AdcashDisplayBanner";
-import BreakingTicker from "../compoents/BreakingTicker";
-{/* Breaking Ticker */}
+import BreakingTicker from "../components/BreakingTicker";
+
 
 
 export default function Home() {
