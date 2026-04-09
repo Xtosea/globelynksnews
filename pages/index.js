@@ -9,7 +9,7 @@ import StickyShare from "../components/StickyShare";
 import { categories } from "../data/categories";
 import Link from "next/link";
 import SocialShare from "../components/SocialShare";
-import AdcashBanner from "../components/AdcashBanner"
+import AdcashBanner1 from "../components/AdcashBanner1"
 
 
 export default function Home() {
