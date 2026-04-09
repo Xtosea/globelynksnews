@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdBlock from "../components/AdBlock";
 import StickyShare from "../components/StickyShare";
-import AdcashVideoSlider from "./AdcashVideoSlider";
+import AdcashVideoSlider from "../AdcashVideoSlider";
 import Link from "next/link";
 import SocialShare from "../components/SocialShare";
 import AdcashDisplayBanner from "@/components/AdcashDisplayBanner";
