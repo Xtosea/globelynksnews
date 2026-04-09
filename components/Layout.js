@@ -19,13 +19,6 @@ export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
   const pathname = usePathname();
 
-  const currentCategory =
-    pathname && pathname.startsWith("/category/")
-      ? pathname.split("/category/")[1]
-      : null;
-
-  const categories = ["world", "politics", "nigeria", "technology", "business"];
-
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -47,59 +40,41 @@ export default function Layout({ children }) {
       {/* Navbar */}
       <Navbar />
 
+      {/* Ads */}
       <AdsterraBanner1 />
-
-
-      {/* Ad Banner */}
       <AdcashDisplayBanner />
 
       {/* Breaking Ticker */}
-      {posts.length > 0 && (
-        <BreakingTicker posts={posts} category={currentCategory} />
-      )}
+      {posts.length > 0 && <BreakingTicker posts={posts} />}
 
       {/* Video Slider */}
       <AdcashVideoSlider />
 
-      {/* Category Banner */}
+      {/* Trending Headlines Link */}
       <div className="bg-red-600 text-white py-2">
-        <div className="max-w-7xl mx-auto px-6 flex gap-6 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-6 flex">
           <Link
             href="/"
-            className={`font-semibold whitespace-nowrap ${
-              !currentCategory ? "underline" : ""
-            }`}
+            className="font-semibold text-sm md:text-base hover:underline"
           >
             🔥 Trending Headlines
           </Link>
-
-          {categories.map((cat) => (
-            <Link
-              key={cat}
-              href={`/category/${cat}`}
-              className={`whitespace-nowrap capitalize ${
-                currentCategory === cat ? "underline font-bold" : ""
-              }`}
-            >
-              {cat}
-            </Link>
-          ))}
         </div>
       </div>
 
       {/* Back Button */}
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 mt-4">
         <BackButton />
       </div>
 
       {/* Main Content */}
-      <main className="min-h-screen">{children}</main>
+      <main className="min-h-screen max-w-7xl mx-auto px-6 py-6">{children}</main>
 
       {/* More Headlines */}
       <div className="bg-gray-100 py-8">
         <div className="max-w-7xl mx-auto px-6">
           <h3 className="text-xl font-bold mb-4">More Trending Headlines</h3>
-          <Link href="/" className="text-red-600 font-semibold">
+          <Link href="/" className="text-red-600 font-semibold hover:underline">
             View Latest News →
           </Link>
         </div>
