@@ -73,7 +73,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-[200]">
       
       {/* Top Red Bar */}
-      <div className="bg-red-700 text-white text-sm py-2 px-6 relative z-[200]">
+      <div className="bg-red-700 text-white text-sm py-1.5 px-6 relative z-[200]">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           
           <span className="font-bold text-lg tracking-wide">
@@ -159,46 +159,46 @@ export default function Navbar() {
 
       {/* Category Menu */}
       <nav className="bg-white border-b relative z-[200]">
-        <div
-          className={`max-w-7xl mx-auto flex flex-col md:flex-row gap-4 md:gap-6 px-6 py-3 overflow-x-auto transition-all duration-300 ${
-            open ? "flex" : "hidden md:flex"
+  <div
+    className={`max-w-7xl mx-auto flex flex-col md:flex-row gap-2 md:gap-4 px-6 py-2 overflow-x-auto transition-all duration-300 ${
+      open ? "flex" : "hidden md:flex"
+    }`}
+  >
+
+    <Link
+      href="/"
+      onClick={handleLinkClick}
+      className={`font-semibold text-sm ${
+        pathname === "/"
+          ? "text-red-600 border-b-2 border-red-600"
+          : "text-gray-700"
+      }`}
+    >
+      HOME
+    </Link>
+
+    {categories.map((cat) => {
+      const slug = cat.toLowerCase().replace(/\s+/g, "-")
+      const isActive = pathname === `/category/${slug}`
+
+      return (
+        <Link
+          key={slug}
+          href={`/category/${slug}`}
+          onClick={handleLinkClick}
+          className={`uppercase text-xs md:text-sm font-semibold pb-1 transition ${
+            isActive
+              ? "text-red-600 border-b-2 border-red-600"
+              : "text-gray-700 hover:text-red-600"
           }`}
         >
+          {cat}
+        </Link>
+      )
+    })}
 
-          <Link
-            href="/"
-            onClick={handleLinkClick}
-            className={`font-semibold ${
-              pathname === "/"
-                ? "text-red-600 border-b-2 border-red-600"
-                : "text-gray-700"
-            }`}
-          >
-            HOME
-          </Link>
-
-          {categories.map((cat) => {
-            const slug = cat.toLowerCase().replace(/\s+/g, "-")
-            const isActive = pathname === `/category/${slug}`
-
-            return (
-              <Link
-                key={slug}
-                href={`/category/${slug}`}
-                onClick={handleLinkClick}
-                className={`uppercase text-sm font-semibold pb-1 transition ${
-                  isActive
-                    ? "text-red-600 border-b-2 border-red-600"
-                    : "text-gray-700 hover:text-red-600"
-                }`}
-              >
-                {cat}
-              </Link>
-            )
-          })}
-
-        </div>
-      </nav>
+  </div>
+</nav>
 
     </header>
   )
