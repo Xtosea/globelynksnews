@@ -4,7 +4,7 @@ export default function AdcashBanner() {
   useEffect(() => {
     if (window.aclib) {
       window.aclib.runBanner({
-        zoneId: '11174774',
+        zoneId: '11174826',
       })
     }
   }, [])
