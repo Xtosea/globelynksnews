@@ -45,7 +45,7 @@ export default function Layout({ children }) {
       <AdcashDisplayBanner />
 
       
-)}
+
 
       {/* Video Slider */}
       <AdcashVideoSlider />
