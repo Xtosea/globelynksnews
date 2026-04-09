@@ -6,12 +6,55 @@ import Article from "@/models/Article";
 const parser = new Parser();
 const DEFAULT_IMAGE = "https://trendingnews.globelynks.com/no-image.jpg";
 
-// Define allowed categories (matching frontend)
-const allowedCategories = ["nigeria", "politics", "world", "sports", "technology", "business", "entertainment"];
+// Smart Category Detection
+function detectCategory(title, content, fallback) {
+  const text = `${title} ${content}`.toLowerCase();
 
+  if (
+    text.includes("election") ||
+    text.includes("president") ||
+    text.includes("senate") ||
+    text.includes("governor") ||
+    text.includes("minister") ||
+    text.includes("politics")
+  ) return "politics";
+
+  if (
+    text.includes("football") ||
+    text.includes("match") ||
+    text.includes("goal") ||
+    text.includes("sports") ||
+    text.includes("premier league")
+  ) return "sports";
+
+  if (
+    text.includes("tech") ||
+    text.includes("ai") ||
+    text.includes("technology") ||
+    text.includes("startup")
+  ) return "technology";
+
+  if (
+    text.includes("business") ||
+    text.includes("market") ||
+    text.includes("economy") ||
+    text.includes("bank")
+  ) return "business";
+
+  if (
+    text.includes("music") ||
+    text.includes("movie") ||
+    text.includes("celebrity") ||
+    text.includes("entertainment")
+  ) return "entertainment";
+
+  return fallback || "world";
+}
+
+// Feeds
 const feeds = [
   { url: "https://feeds.bbci.co.uk/news/rss.xml", source: "BBC News", category: "world" },
-  { url: "https://www.vanguardngr.com/feed/", source: "Vanguard News", category: "nigeria" },
+  { url: "https://www.vanguardngr.com/feed/", source: "Vanguard", category: "nigeria" },
   { url: "https://www.premiumtimesng.com/feed", source: "Premium Times", category: "nigeria" },
   { url: "https://www.theguardian.com/world/rss", source: "Guardian", category: "world" },
   { url: "https://www.cnn.com/rss/edition.rss", source: "CNN", category: "world" },
@@ -20,25 +63,24 @@ const feeds = [
   { url: "https://feeds.feedburner.com/TechCrunch", source: "TechCrunch", category: "technology" }
 ];
 
-// Extract largest/first meaningful image from article page
+// Extract Image
 async function extractImageFromArticle(url) {
   try {
-    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0" }
+    });
+
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    const candidates = [
-      $('meta[property="og:image"]').attr("content"),
-      $('meta[name="twitter:image"]').attr("content"),
-      $("article img").map((i, el) => $(el).attr("src")).get(),
-      $("figure img").map((i, el) => $(el).attr("src")).get(),
-      $(".td-post-featured-image img").map((i, el) => $(el).attr("src")).get(),
-      $("img").map((i, el) => $(el).attr("src")).get(),
-    ].flat().filter(Boolean);
+    const image =
+      $('meta[property="og:image"]').attr("content") ||
+      $('meta[name="twitter:image"]').attr("content") ||
+      $("article img").first().attr("src") ||
+      $("img").first().attr("src");
 
-    return candidates[0] || DEFAULT_IMAGE;
+    return image || DEFAULT_IMAGE;
   } catch (err) {
-    console.log("Image extraction failed:", url, err.message);
     return DEFAULT_IMAGE;
   }
 }
@@ -53,10 +95,10 @@ export async function GET() {
         const parsed = await parser.parseURL(feed.url);
 
         for (const item of parsed.items) {
-          // Deduplicate by URL or title
           const exists = await Article.findOne({
-            $or: [{ originalUrl: item.link }, { title: item.title }],
+            originalUrl: item.link
           });
+
           if (exists) continue;
 
           let image =
@@ -65,33 +107,49 @@ export async function GET() {
             item["media:thumbnail"]?.url ||
             null;
 
-          if (!image) image = await extractImageFromArticle(item.link);
+          if (!image) {
+            image = await extractImageFromArticle(item.link);
+          }
 
-          // Normalize category
-          const normalizedCategory = feed.category?.toLowerCase().trim();
-          const finalCategory = allowedCategories.includes(normalizedCategory) ? normalizedCategory : "world";
+          // Smart category detection
+          const category = detectCategory(
+            item.title,
+            item.contentSnippet || item.content,
+            feed.category
+          );
 
           await Article.create({
             title: item.title,
             content: item.contentSnippet || item.content || "",
             image: image || DEFAULT_IMAGE,
             source: feed.source,
-            category: finalCategory, // normalized
+            category,
             originalUrl: item.link,
             type: "rss",
-            publishedAt: item.pubDate ? new Date(item.pubDate) : new Date(),
+            publishedAt: item.pubDate
+              ? new Date(item.pubDate)
+              : new Date(),
           });
 
           imported++;
         }
+
       } catch (err) {
         console.log("Feed error:", feed.source, err.message);
       }
     }
 
-    return Response.json({ success: true, imported });
+    return Response.json({
+      success: true,
+      imported
+    });
+
   } catch (error) {
     console.error(error);
-    return Response.json({ success: false, error: "Import failed" });
+
+    return Response.json({
+      success: false,
+      error: "Import failed"
+    });
   }
 }
