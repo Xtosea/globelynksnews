@@ -10,7 +10,7 @@ import AdcashVideoSlider from "./AdcashVideoSlider";
 import Link from "next/link";
 import SocialShare from "../components/SocialShare";
 import AdcashDisplayBanner from "@/components/AdcashDisplayBanner";
-import BreakingTicker from "./BreakingTicker";
+import BreakingTicker from "../BreakingTicker";
 {/* Breaking Ticker */}
 
 
