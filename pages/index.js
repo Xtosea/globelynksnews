@@ -6,11 +6,11 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdBlock from "../components/AdBlock";
 import StickyShare from "../components/StickyShare";
-import AdcashVideoSlider from "../AdcashVideoSlider";
+import AdcashVideoSlider from "../components/AdcashVideoSlider";
 import Link from "next/link";
 import SocialShare from "../components/SocialShare";
 import AdcashDisplayBanner from "@/components/AdcashDisplayBanner";
-import BreakingTicker from "../BreakingTicker";
+import BreakingTicker from "../compoents/BreakingTicker";
 {/* Breaking Ticker */}
 
 
