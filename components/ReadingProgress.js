@@ -7,15 +7,13 @@ export default function ReadingProgress() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const totalHeight =
+      const scrollTop = window.scrollY;
+      const height =
         document.documentElement.scrollHeight -
         document.documentElement.clientHeight;
 
-      const scrollPosition = window.scrollY;
-
-      const scrollPercent = (scrollPosition / totalHeight) * 100;
-
-      setProgress(scrollPercent);
+      const scrolled = (scrollTop / height) * 100;
+      setProgress(scrolled);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -24,9 +22,11 @@ export default function ReadingProgress() {
   }, []);
 
   return (
-    <div
-      className="fixed top-0 left-0 h-1 bg-red-600 z-50 transition-all duration-200"
-      style={{ width: `${progress}%` }}
-    />
+    <div className="fixed top-0 left-0 w-full h-1 z-[9999] bg-gray-200">
+      <div
+        className="h-full bg-gradient-to-r from-red-500 to-orange-500 transition-all duration-200"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
   );
 }
