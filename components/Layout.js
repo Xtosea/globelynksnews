@@ -6,14 +6,14 @@ import Link from "next/link";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-
-import BackButton from "./BackButton"; // import it
+import BackButton from "./BackButton";
 import BreakingTicker from "./BreakingTicker";
+import ScrollTopButton from "./ScrollTopButton";
+import ReadingProgress from "./ReadingProgress";
 
 export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
-  const pathname = usePathname(); // can be null during SSR
-import ScrollTopButton from "./ScrollTopButton";
+  const pathname = usePathname();
 
   // Determine current category
   const currentCategory =
@@ -23,7 +23,7 @@ import ScrollTopButton from "./ScrollTopButton";
 
   const categories = ["world", "politics", "nigeria", "technology", "business"];
 
-  // Fetch posts for ticker (client-side only)
+  // Fetch posts for ticker
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -39,6 +39,9 @@ import ScrollTopButton from "./ScrollTopButton";
 
   return (
     <>
+      {/* Reading Progress Bar */}
+      <ReadingProgress />
+
       {/* Navbar */}
       <Navbar />
 
@@ -72,11 +75,11 @@ import ScrollTopButton from "./ScrollTopButton";
           ))}
         </div>
       </div>
- 
-    {/* Back Button — MOVE HERE */}
-<div className="max-w-7xl mx-auto px-6">
-  <BackButton />
-</div>
+
+      {/* Back Button */}
+      <div className="max-w-7xl mx-auto px-6">
+        <BackButton />
+      </div>
 
       {/* Main Content */}
       <main className="min-h-screen">{children}</main>
@@ -90,7 +93,8 @@ import ScrollTopButton from "./ScrollTopButton";
           </Link>
         </div>
       </div>
-      
+
+      {/* Scroll to Top */}
       <ScrollTopButton />
 
       {/* Footer */}
