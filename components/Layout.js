@@ -13,6 +13,7 @@ import BreakingTicker from "./BreakingTicker";
 export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
   const pathname = usePathname(); // can be null during SSR
+import ScrollTopButton from "./ScrollTopButton";
 
   // Determine current category
   const currentCategory =
@@ -90,6 +91,7 @@ export default function Layout({ children }) {
         </div>
       </div>
       
+      <ScrollTopButton />
 
       {/* Footer */}
       <Footer />
