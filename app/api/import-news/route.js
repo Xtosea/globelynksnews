@@ -6,49 +6,18 @@ import Article from "@/models/Article";
 const parser = new Parser();
 const DEFAULT_IMAGE = "https://trendingnews.globelynks.com/no-image.jpg";
 
-// Popular news feeds
+// Define allowed categories (matching frontend)
+const allowedCategories = ["nigeria", "politics", "world", "sports", "technology", "business", "entertainment"];
 
 const feeds = [
-  { 
-    url: "https://feeds.bbci.co.uk/news/rss.xml", 
-    source: "BBC News",
-    category: "world"
-  },
-  { 
-    url: "https://www.vanguardngr.com/feed/", 
-    source: "Vanguard News",
-    category: "nigeria"
-  },
-  { 
-    url: "https://www.premiumtimesng.com/feed", 
-    source: "Premium Times",
-    category: "nigeria"
-  },
-  { 
-    url: "https://www.theguardian.com/world/rss", 
-    source: "Guardian",
-    category: "world"
-  },
-  { 
-    url: "https://www.cnn.com/rss/edition.rss", 
-    source: "CNN",
-    category: "world"
-  },
-  { 
-    url: "https://www.aljazeera.com/xml/rss/all.xml", 
-    source: "Al Jazeera",
-    category: "world"
-  },
-  {
-    url: "https://www.espn.com/espn/rss/news",
-    source: "ESPN",
-    category: "sports"
-  },
-  {
-    url: "https://feeds.feedburner.com/TechCrunch",
-    source: "TechCrunch",
-    category: "technology"
-  }
+  { url: "https://feeds.bbci.co.uk/news/rss.xml", source: "BBC News", category: "world" },
+  { url: "https://www.vanguardngr.com/feed/", source: "Vanguard News", category: "nigeria" },
+  { url: "https://www.premiumtimesng.com/feed", source: "Premium Times", category: "nigeria" },
+  { url: "https://www.theguardian.com/world/rss", source: "Guardian", category: "world" },
+  { url: "https://www.cnn.com/rss/edition.rss", source: "CNN", category: "world" },
+  { url: "https://www.aljazeera.com/xml/rss/all.xml", source: "Al Jazeera", category: "world" },
+  { url: "https://www.espn.com/espn/rss/news", source: "ESPN", category: "sports" },
+  { url: "https://feeds.feedburner.com/TechCrunch", source: "TechCrunch", category: "technology" }
 ];
 
 // Extract largest/first meaningful image from article page
@@ -58,7 +27,6 @@ async function extractImageFromArticle(url) {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    // Collect candidate images
     const candidates = [
       $('meta[property="og:image"]').attr("content"),
       $('meta[name="twitter:image"]').attr("content"),
@@ -68,7 +36,6 @@ async function extractImageFromArticle(url) {
       $("img").map((i, el) => $(el).attr("src")).get(),
     ].flat().filter(Boolean);
 
-    // Optional: pick largest by fetching width/height (if needed)
     return candidates[0] || DEFAULT_IMAGE;
   } catch (err) {
     console.log("Image extraction failed:", url, err.message);
@@ -92,7 +59,6 @@ export async function GET() {
           });
           if (exists) continue;
 
-          // Feed image or extract from page
           let image =
             item.enclosure?.url ||
             item["media:content"]?.url ||
@@ -101,18 +67,20 @@ export async function GET() {
 
           if (!image) image = await extractImageFromArticle(item.link);
 
+          // Normalize category
+          const normalizedCategory = feed.category?.toLowerCase().trim();
+          const finalCategory = allowedCategories.includes(normalizedCategory) ? normalizedCategory : "world";
+
           await Article.create({
-  title: item.title,
-  content: item.contentSnippet || item.content || "",
-  image: image || DEFAULT_IMAGE,
-  source: feed.source,
-  category: feed.category,   // add this
-  originalUrl: item.link,
-  type: "rss",
-  publishedAt: item.pubDate
-    ? new Date(item.pubDate)
-    : new Date(),
-});
+            title: item.title,
+            content: item.contentSnippet || item.content || "",
+            image: image || DEFAULT_IMAGE,
+            source: feed.source,
+            category: finalCategory, // normalized
+            originalUrl: item.link,
+            type: "rss",
+            publishedAt: item.pubDate ? new Date(item.pubDate) : new Date(),
+          });
 
           imported++;
         }
