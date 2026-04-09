@@ -1,13 +1,21 @@
+"use client";
+
 import { useEffect } from "react";
 
-export default function AdcashVideoSlider() {
+export default function AdcashDisplayBanner() {
   useEffect(() => {
-    if (window.aclib) {
-      window.aclib.runBanner({
-        zoneId: "11175706",
-      });
-    }
+    const interval = setInterval(() => {
+      if (window.aclib) {
+        window.aclib.runBanner({
+          zoneId: "11175706",
+        });
+
+        clearInterval(interval);
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
   }, []);
 
-  return null;
+  return <div id="adcash-banner"></div>;
 }
