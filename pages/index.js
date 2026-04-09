@@ -9,6 +9,7 @@ import StickyShare from "../components/StickyShare";
 import { categories } from "../data/categories";
 import Link from "next/link";
 import SocialShare from "../components/SocialShare";
+import AdcashBanner from "../components/AdcashBanner"
 
 
 export default function Home() {
@@ -83,6 +84,10 @@ export default function Home() {
                   {posts[0].title}
                 </h1>
               </a>
+
+            <div>
+      <AdcashBanner />
+    </div>
 
               {/* TOP IMAGE */}
               <div className="w-full aspect-video rounded overflow-hidden bg-gray-200">
