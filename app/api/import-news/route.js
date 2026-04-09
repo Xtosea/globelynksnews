@@ -4,13 +4,9 @@ import { connectDB } from "@/lib/mongodb";
 import Article from "@/models/Article";
 
 const parser = new Parser();
+const DEFAULT_IMAGE = "https://trendingnews.globelynks.com/no-image.jpg";
 
-const DEFAULT_IMAGE =
-  "https://trendingnews.globelynks.com/no-image.jpg";
-
-/* ================================
-   Smart Category Detection
-================================ */
+// Smart Category Detection
 function detectCategory(title, content, fallback) {
   const text = `${title} ${content}`.toLowerCase();
 
@@ -21,8 +17,7 @@ function detectCategory(title, content, fallback) {
     text.includes("governor") ||
     text.includes("minister") ||
     text.includes("politics")
-  )
-    return "politics";
+  ) return "politics";
 
   if (
     text.includes("football") ||
@@ -30,114 +25,49 @@ function detectCategory(title, content, fallback) {
     text.includes("goal") ||
     text.includes("sports") ||
     text.includes("premier league")
-  )
-    return "sports";
+  ) return "sports";
 
   if (
     text.includes("tech") ||
     text.includes("ai") ||
     text.includes("technology") ||
     text.includes("startup")
-  )
-    return "technology";
+  ) return "technology";
 
   if (
     text.includes("business") ||
     text.includes("market") ||
     text.includes("economy") ||
     text.includes("bank")
-  )
-    return "business";
+  ) return "business";
 
   if (
     text.includes("music") ||
     text.includes("movie") ||
     text.includes("celebrity") ||
     text.includes("entertainment")
-  )
-    return "entertainment";
-
-  if (
-    text.includes("nigeria") ||
-    text.includes("lagos") ||
-    text.includes("abuja") ||
-    text.includes("tinubu")
-  )
-    return "nigeria";
+  ) return "entertainment";
 
   return fallback || "world";
 }
 
-/* ================================
-   RSS Feeds
-================================ */
-
+// Feeds
 const feeds = [
-  {
-    url: "https://feeds.bbci.co.uk/news/rss.xml",
-    source: "BBC News",
-    category: "world",
-  },
-
-  {
-    url: "https://www.vanguardngr.com/feed/",
-    source: "Vanguard",
-    category: "nigeria",
-  },
-
-  {
-    url: "https://www.premiumtimesng.com/feed",
-    source: "Premium Times",
-    category: "nigeria",
-  },
-
-  {
-    url: "https://www.theguardian.com/world/rss",
-    source: "Guardian",
-    category: "world",
-  },
-
-  {
-    url: "https://www.cnn.com/rss/edition.rss",
-    source: "CNN",
-    category: "world",
-  },
-
-  {
-    url: "https://www.aljazeera.com/xml/rss/all.xml",
-    source: "Al Jazeera",
-    category: "world",
-  },
-
-  {
-    url: "https://www.espn.com/espn/rss/news",
-    source: "ESPN",
-    category: "sports",
-  },
-
-  {
-    url: "https://feeds.feedburner.com/TechCrunch",
-    source: "TechCrunch",
-    category: "technology",
-  },
-
-  {
-    url: "https://www.goal.com/feeds/en/news",
-    source: "Goal",
-    category: "sports",
-  },
+  { url: "https://feeds.bbci.co.uk/news/rss.xml", source: "BBC News", category: "world" },
+  { url: "https://www.vanguardngr.com/feed/", source: "Vanguard", category: "nigeria" },
+  { url: "https://www.premiumtimesng.com/feed", source: "Premium Times", category: "nigeria" },
+  { url: "https://www.theguardian.com/world/rss", source: "Guardian", category: "world" },
+  { url: "https://www.cnn.com/rss/edition.rss", source: "CNN", category: "world" },
+  { url: "https://www.aljazeera.com/xml/rss/all.xml", source: "Al Jazeera", category: "world" },
+  { url: "https://www.espn.com/espn/rss/news", source: "ESPN", category: "sports" },
+  { url: "https://feeds.feedburner.com/TechCrunch", source: "TechCrunch", category: "technology" }
 ];
 
-/* ================================
-   Extract Image
-================================ */
-
+// Extract Image
 async function extractImageFromArticle(url) {
   try {
     const res = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-      },
+      headers: { "User-Agent": "Mozilla/5.0" }
     });
 
     const html = await res.text();
@@ -146,50 +76,18 @@ async function extractImageFromArticle(url) {
     const image =
       $('meta[property="og:image"]').attr("content") ||
       $('meta[name="twitter:image"]').attr("content") ||
-      $("article img")
-        .not("[width='1']")
-        .not("[height='1']")
-        .first()
-        .attr("src") ||
-      $("img")
-        .not("[width='1']")
-        .not("[height='1']")
-        .first()
-        .attr("src");
+      $("article img").first().attr("src") ||
+      $("img").first().attr("src");
 
     return image || DEFAULT_IMAGE;
   } catch (err) {
-    console.log("Image extraction failed:", url);
     return DEFAULT_IMAGE;
   }
 }
 
-/* ================================
-   Clean Content
-================================ */
-
-function cleanSummary(item) {
-  const raw =
-    item.contentSnippet ||
-    item.content ||
-    item.summary ||
-    "";
-
-  return raw
-    .replace(/<[^>]*>?/gm, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .substring(0, 220);
-}
-
-/* ================================
-   Import News
-================================ */
-
 export async function GET() {
   try {
     await connectDB();
-
     let imported = 0;
 
     for (const feed of feeds) {
@@ -198,7 +96,7 @@ export async function GET() {
 
         for (const item of parsed.items) {
           const exists = await Article.findOne({
-            originalUrl: item.link,
+            originalUrl: item.link
           });
 
           if (exists) continue;
@@ -213,17 +111,16 @@ export async function GET() {
             image = await extractImageFromArticle(item.link);
           }
 
-          const summary = cleanSummary(item);
-
+          // Smart category detection
           const category = detectCategory(
             item.title,
-            summary,
+            item.contentSnippet || item.content,
             feed.category
           );
 
           await Article.create({
             title: item.title,
-            content: summary,
+            content: item.contentSnippet || item.content || "",
             image: image || DEFAULT_IMAGE,
             source: feed.source,
             category,
@@ -236,25 +133,23 @@ export async function GET() {
 
           imported++;
         }
+
       } catch (err) {
-        console.log(
-          "Feed error:",
-          feed.source,
-          err.message
-        );
+        console.log("Feed error:", feed.source, err.message);
       }
     }
 
     return Response.json({
       success: true,
-      imported,
+      imported
     });
+
   } catch (error) {
     console.error(error);
 
     return Response.json({
       success: false,
-      error: "Import failed",
+      error: "Import failed"
     });
   }
 }
