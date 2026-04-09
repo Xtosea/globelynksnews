@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdBlock from "../components/AdBlock";
 import StickyShare from "../components/StickyShare";
-import { categories } from "../data/categories";
+
 import Link from "next/link";
 import SocialShare from "../components/SocialShare";
 
@@ -51,19 +51,7 @@ export default function Home() {
    <>
     
    
-   <div className="border-b py-3 overflow-x-auto">
-  <div className="flex gap-6 max-w-7xl mx-auto px-6">
-    {categories.map((cat) => (
-      <Link
-        key={cat}
-        href={`/category/${cat}`}
-        className="whitespace-nowrap font-medium hover:text-red-600 capitalize"
-      >
-        {cat}
-      </Link>
-    ))}
-  </div>
-</div>
+   
 
       <StickyShare />
 
@@ -113,7 +101,7 @@ export default function Home() {
             </div>
           )}
 
-          <AdBlock />
+         
 
           {/* OTHER ARTICLES */}
           {posts.slice(1).map((post) => (
@@ -128,6 +116,8 @@ export default function Home() {
                   {post.title}
                 </h2>
               </a>
+            
+             <AdBlock />
 
               {/* ARTICLE IMAGE */}
               <div className="w-full aspect-video rounded overflow-hidden bg-gray-200">
