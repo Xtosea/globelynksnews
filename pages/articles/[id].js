@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Head from "next/head";
+import ReadingTime from "@/components/ReadingTime";
 
 export default function ArticlePage({ article }) {
   const [views, setViews] = useState(article.views || 0);
@@ -40,6 +41,14 @@ export default function ArticlePage({ article }) {
           property="og:url"
           content={`https://trendingnews.globelynks.com/articles/${article._id}`}
         />
+
+  <article>
+  <ReadingTime />
+
+  <h1>Article Title</h1>
+
+  <p>Article content...</p>
+</article>
 
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
