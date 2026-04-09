@@ -8,6 +8,7 @@ import AdBlock from "../components/AdBlock";
 import StickyShare from "../components/StickyShare";
 import { categories } from "../data/categories";
 import Link from "next/link";
+import SocialShare from "../components/SocialShare";
 
 
 export default function Home() {
@@ -102,6 +103,7 @@ export default function Home() {
                 </p>
               )}
 
+          <SocialShare post={posts[0]} />
               <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg">
                 {posts[0].excerpt || posts[0].content || ""}
               </p>
@@ -136,7 +138,7 @@ export default function Home() {
     className="w-full h-full object-cover"
   />
 </div>
-
+              <SocialShare post={post} />
               {post.source && (
                 <p className="text-gray-400 text-sm">
                   Source: {post.source}
