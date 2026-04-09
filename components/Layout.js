@@ -14,13 +14,10 @@ import ReadingProgress from "./ReadingProgress";
 import AdcashVideoSlider from "./AdcashVideoSlider";
 import AdcashDisplayBanner from "./AdcashDisplayBanner";
 
-AdcashDisplayBanner
-
 export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
   const pathname = usePathname();
 
-  // Determine current category
   const currentCategory =
     pathname && pathname.startsWith("/category/")
       ? pathname.split("/category/")[1]
@@ -28,7 +25,6 @@ export default function Layout({ children }) {
 
   const categories = ["world", "politics", "nigeria", "technology", "business"];
 
-  // Fetch posts for ticker
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -44,23 +40,22 @@ export default function Layout({ children }) {
 
   return (
     <>
-      {/* Reading Progress Bar */}
+      {/* Reading Progress */}
       <ReadingProgress />
 
       {/* Navbar */}
       <Navbar />
+
+      {/* Ad Banner */}
+      <AdcashDisplayBanner />
 
       {/* Breaking Ticker */}
       {posts.length > 0 && (
         <BreakingTicker posts={posts} category={currentCategory} />
       )}
 
-    {/* AdcashDisplayBanner */}
-      <div>
- <>
+      {/* Video Slider */}
       <AdcashVideoSlider />
-  </>
-</div>
 
       {/* Category Banner */}
       <div className="bg-red-600 text-white py-2">
@@ -105,14 +100,6 @@ export default function Layout({ children }) {
           </Link>
         </div>
       </div>
-  
-          <>
-      <AdcashVideoSlider />
-
-      <h1>Trending News</h1>
-    </>
-
-     
 
       {/* Scroll to Top */}
       <ScrollTopButton />
