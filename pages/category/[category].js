@@ -1,74 +1,84 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 
 export default function CategoryPage() {
-  const router = useRouter();
-  const { category } = router.query;
-  const [posts, setPosts] = useState([]);
+  const { category } = useParams();
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!category) return;
 
-    Promise.all([
-      fetch("/api/posts"),
-      fetch("/api/articles")
-    ])
-      .then(async ([postRes, articleRes]) => {
-        const postsData = await postRes.json();
-        const articlesData = await articleRes.json();
-
-        const combined = [...postsData, ...articlesData];
-
-        setPosts(
-          combined.filter(
-            p => p.category?.toLowerCase() === category.toLowerCase()
-          )
+    fetch("/api/articles")
+      .then(res => res.json())
+      .then(data => {
+        const filtered = data.filter(
+          article =>
+            article.category?.toLowerCase() === category.toLowerCase()
         );
+
+        setArticles(filtered);
+        setLoading(false);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
   }, [category]);
 
-  if (!category) return null;
+  if (loading) {
+    return (
+      <div className="max-w-6xl mx-auto p-6">
+        <h2 className="text-2xl font-bold capitalize">{category}</h2>
+        <p className="mt-4">Loading articles...</p>
+      </div>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold capitalize mb-8">{category} News</h1>
+    <div className="max-w-6xl mx-auto p-6">
+      <h1 className="text-3xl font-bold capitalize mb-6">
+        {category} News
+      </h1>
 
-        {posts.length === 0 && (
-          <p className="text-gray-600">No articles yet in this category.</p>
-        )}
+      {articles.length === 0 && (
+        <p>No articles yet in this category.</p>
+      )}
 
-        <div className="space-y-6">
-          {posts.map(post => (
-            <div key={post._id || post.slug} className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-              <h2 className="text-2xl font-semibold mb-2">
-                <Link href={`/posts/${post.slug}`} className="hover:underline">
-                  {post.title}
-                </Link>
-              </h2>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {articles.map(article => (
+          <Link
+            key={article._id}
+            href={`/articles/${article._id}`}
+            className="block border rounded-lg overflow-hidden hover:shadow-lg transition"
+          >
+            <div className="aspect-video bg-gray-100">
+              <img
+                src={article.image}
+                alt={article.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
-              <p className="text-sm text-gray-500 mb-3">
-                {post.author || "Globelynks"} ·{" "}
-                {post.publishedAt ? new Date(post.publishedAt).toDateString() : "Unknown date"}
+            <div className="p-4">
+              <p className="text-xs text-red-600 font-semibold uppercase mb-2">
+                {article.source}
               </p>
 
-              <p className="text-gray-700">{post.excerpt || post.content?.slice(0, 200)}</p>
+              <h2 className="font-bold text-lg leading-tight">
+                {article.title}
+              </h2>
 
-              {post.image && (
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-64 object-cover rounded mt-4"
-                />
-              )}
+              <p className="text-sm text-gray-500 mt-2">
+                {new Date(article.publishedAt).toLocaleDateString()}
+              </p>
             </div>
-          ))}
-        </div>
+          </Link>
+        ))}
       </div>
-    </main>
+    </div>
   );
 }
