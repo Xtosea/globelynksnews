@@ -16,16 +16,7 @@ export default function Document() {
         <Main />
         <NextScript />
 
-        {/* Monetad Script */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              aclib.runAutoTag({
-                zoneId: '0vlavhw2a'
-              });
-            `,
-          }}
-        />
+        
       </body>
     </Html>
   );
