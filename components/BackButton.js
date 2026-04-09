@@ -1,20 +1,32 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 export default function BackButton() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Hide button on homepage
   if (pathname === "/") return null;
 
   return (
     <button
       onClick={() => router.back()}
-      className="mt-4 mb-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:opacity-80 transition"
+      className="
+      fixed 
+      bottom-6 
+      left-6 
+      z-50 
+      bg-red-600 
+      hover:bg-red-700 
+      text-white 
+      p-3 
+      rounded-full 
+      shadow-lg 
+      transition
+      "
     >
-      ← Back
+      <ArrowLeft size={20} />
     </button>
   );
 }
