@@ -11,7 +11,10 @@ import BreakingTicker from "./BreakingTicker";
 import ScrollTopButton from "./ScrollTopButton";
 import ReadingProgress from "./ReadingProgress";
 import AdcashBanner1 from ".AdcashBanner1"
-import AdcashVideoSlider from "../components/AdcashVideoSlider";
+import AdcashVideoSlider from "./AdcashVideoSlider";
+import AdcashDisplayBanner from "./AdcashDisplayBanner";
+
+AdcashDisplayBanner
 
 export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
@@ -51,6 +54,13 @@ export default function Layout({ children }) {
       {posts.length > 0 && (
         <BreakingTicker posts={posts} category={currentCategory} />
       )}
+
+    {/* AdcashDisplayBanner */}
+      <div>
+ <>
+      <AdcashVideoSlider />
+  </>
+</div>
 
       {/* Category Banner */}
       <div className="bg-red-600 text-white py-2">
