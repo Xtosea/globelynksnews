@@ -6,6 +6,8 @@ import Link from "next/link";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+
+import BackButton from "../BackButton"; // import it
 import BreakingTicker from "./BreakingTicker";
 
 export default function Layout({ children }) {
@@ -82,6 +84,7 @@ export default function Layout({ children }) {
           </Link>
         </div>
       </div>
+      <BackButton />
 
       {/* Footer */}
       <Footer />
