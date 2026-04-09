@@ -1,19 +1,18 @@
 "use client";
 
-import Navbar from "./Navbar";
-import Footer from "./Footer";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import dynamic from "next/dynamic";
+import Link from "next/link";
 
-// Dynamically import BreakingTicker (client-only)
-const BreakingTicker = dynamic(() => import("./BreakingTicker"), { ssr: false });
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+import BreakingTicker from "./BreakingTicker";
 
 export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
   const pathname = usePathname(); // can be null during SSR
 
+  // Determine current category
   const currentCategory =
     pathname && pathname.startsWith("/category/")
       ? pathname.split("/category/")[1]
@@ -21,7 +20,7 @@ export default function Layout({ children }) {
 
   const categories = ["world", "politics", "nigeria", "technology", "business"];
 
-  // Fetch posts for ticker
+  // Fetch posts for ticker (client-side only)
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -37,10 +36,13 @@ export default function Layout({ children }) {
 
   return (
     <>
+      {/* Navbar */}
       <Navbar />
 
-      {/* Breaking News Ticker */}
-      {posts.length > 0 && <BreakingTicker posts={posts} category={currentCategory} />}
+      {/* Breaking Ticker */}
+      {posts.length > 0 && (
+        <BreakingTicker posts={posts} category={currentCategory} />
+      )}
 
       {/* Category Banner */}
       <div className="bg-red-600 text-white py-2">
@@ -53,6 +55,7 @@ export default function Layout({ children }) {
           >
             🔥 Trending Headlines
           </Link>
+
           {categories.map((cat) => (
             <Link
               key={cat}
@@ -67,8 +70,10 @@ export default function Layout({ children }) {
         </div>
       </div>
 
+      {/* Main Content */}
       <main className="min-h-screen">{children}</main>
 
+      {/* More Headlines */}
       <div className="bg-gray-100 py-8">
         <div className="max-w-7xl mx-auto px-6">
           <h3 className="text-xl font-bold mb-4">More Trending Headlines</h3>
@@ -78,6 +83,7 @@ export default function Layout({ children }) {
         </div>
       </div>
 
+      {/* Footer */}
       <Footer />
     </>
   );
