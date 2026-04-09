@@ -10,9 +10,6 @@ import BackButton from "./BackButton";
 
 import ScrollTopButton from "./ScrollTopButton";
 import ReadingProgress from "./ReadingProgress";
-import AdsterraBanner1 from "@/components/ads/AdsterraBanner1";
-
-import AdcashVideoSlider from "./AdcashVideoSlider";
 import AdcashDisplayBanner from "./AdcashDisplayBanner";
 
 export default function Layout({ children }) {
@@ -40,16 +37,7 @@ export default function Layout({ children }) {
       {/* Navbar */}
       <Navbar />
 
-      {/* Ads */}
-      <AdsterraBanner1 />
-      <AdcashDisplayBanner />
-
       
-
-
-      {/* Video Slider */}
-      <AdcashVideoSlider />
-
       {/* Trending Headlines Link */}
       <div className="bg-red-600 text-white py-2">
         <div className="max-w-7xl mx-auto px-6 flex">
