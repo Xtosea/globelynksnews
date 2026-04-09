@@ -11,6 +11,7 @@ import BreakingTicker from "./BreakingTicker";
 import ScrollTopButton from "./ScrollTopButton";
 import ReadingProgress from "./ReadingProgress";
 import AdcashBanner1 from ".AdcashBanner1"
+import AdcashVideoSlider from "../components/AdcashVideoSlider";
 
 export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
@@ -94,6 +95,12 @@ export default function Layout({ children }) {
           </Link>
         </div>
       </div>
+  
+          <>
+      <AdcashVideoSlider />
+
+      <h1>Trending News</h1>
+    </>
 
      {/* AdcashBanner1 */}
      <div>
