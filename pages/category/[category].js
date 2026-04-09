@@ -1,11 +1,11 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useRouter } from "next/router";
 import Link from "next/link";
 
 export default function CategoryPage() {
-  const { category } = useParams();
+  const router = useRouter();
+  const { category } = router.query;
+
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +32,9 @@ export default function CategoryPage() {
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto p-6">
-        <h2 className="text-2xl font-bold capitalize">{category}</h2>
+        <h2 className="text-2xl font-bold capitalize">
+          {category} News
+        </h2>
         <p className="mt-4">Loading articles...</p>
       </div>
     );
