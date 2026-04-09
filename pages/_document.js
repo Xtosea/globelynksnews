@@ -3,7 +3,14 @@ import { Html, Head, Main, NextScript } from "next/document";
 export default function Document() {
   return (
     <Html lang="en">
-      <Head />
+      <Head>
+        {/* Adcash Library */}
+        <script
+          id="aclib"
+          src="//acscdn.com/script/aclib.js"
+          type="text/javascript"
+        />
+      </Head>
 
       <body className="bg-white dark:bg-gray-900 transition-colors">
         <Main />
@@ -19,7 +26,6 @@ export default function Document() {
             `,
           }}
         />
-
       </body>
     </Html>
   );
