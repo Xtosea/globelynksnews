@@ -10,6 +10,7 @@ import BackButton from "./BackButton";
 import BreakingTicker from "./BreakingTicker";
 import ScrollTopButton from "./ScrollTopButton";
 import ReadingProgress from "./ReadingProgress";
+import AdcashBanner1 from ".AdcashBanner1"
 
 export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
@@ -93,6 +94,11 @@ export default function Layout({ children }) {
           </Link>
         </div>
       </div>
+
+     {/* AdcashBanner1 */}
+     <div>
+      <AdcashBanner1 />
+    </div>
 
       {/* Scroll to Top */}
       <ScrollTopButton />
