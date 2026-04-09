@@ -48,7 +48,7 @@ export default function Home() {
   return (
    
    <>
-    <Navbar />
+    
    
    <div className="border-b py-3 overflow-x-auto">
   <div className="flex gap-6 max-w-7xl mx-auto px-6">
