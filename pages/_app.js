@@ -1,4 +1,5 @@
 import Head from "next/head"
+import Layout from "../components/Layout";
 
 export default function App({ Component, pageProps }) {
   return (
@@ -8,6 +9,11 @@ export default function App({ Component, pageProps }) {
         <script src="https://cdn.tailwindcss.com"></script>
 
         {/* Monetad Ad Script */}
+       
+       <Layout>
+      <Component {...pageProps} />
+    </Layout>
+
         <script
           src="https://5gvci.com/act/files/tag.min.js?z=10851573"
           data-cfasync="false"
