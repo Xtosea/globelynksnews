@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 export default function BreakingTicker({ posts, category }) {
-  // Filter by category if provided
   const filteredPosts = category
     ? posts.filter((p) => p.category === category)
     : posts;
@@ -12,7 +11,7 @@ export default function BreakingTicker({ posts, category }) {
 
   return (
     <div className="bg-red-600 text-white py-2 overflow-hidden">
-      <div className="flex whitespace-nowrap animate-marquee gap-10 px-6">
+      <div className="flex gap-10 animate-marquee whitespace-nowrap px-6">
         {breakingPosts.map((post) => (
           <Link
             key={post._id || post.slug}
