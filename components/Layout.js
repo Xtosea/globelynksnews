@@ -10,7 +10,7 @@ import BackButton from "./BackButton";
 import BreakingTicker from "./BreakingTicker";
 import ScrollTopButton from "./ScrollTopButton";
 import ReadingProgress from "./ReadingProgress";
-import TrendingAd from "../Ads/TrendingAd";
+import TrendingAd from "../ads/TrendingAd";
 
 import AdcashVideoSlider from "./AdcashVideoSlider";
 import AdcashDisplayBanner from "./AdcashDisplayBanner";
