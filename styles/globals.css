@@ -69,11 +69,11 @@ header {
 }
 
 .animate-marquee {
-  display: inline-flex;
-  animation: marquee 25s linear infinite;
+  display: inline-flex; /* keep flex for multiple children */
+  animation: marquee 20s linear infinite; /* consistent duration */
   white-space: nowrap; /* prevent line breaks */
+  gap: 2.5rem; /* optional spacing between headlines */
 }
-
 /* ===================== Scrollbar Styling ===================== */
 ::-webkit-scrollbar {
   width: 6px;
