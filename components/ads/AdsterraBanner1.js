@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-export default function TrendingAd() {
+export default function AdsterraBanner1() {
   useEffect(() => {
     // Prevent duplicate load
     if (document.getElementById("trend-ad-script")) return;
