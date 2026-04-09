@@ -7,7 +7,7 @@ import Link from "next/link";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import BackButton from "./BackButton";
-import BreakingTicker from "./BreakingTicker";
+
 import ScrollTopButton from "./ScrollTopButton";
 import ReadingProgress from "./ReadingProgress";
 import AdsterraBanner1 from "@/components/ads/AdsterraBanner1";
@@ -44,9 +44,7 @@ export default function Layout({ children }) {
       <AdsterraBanner1 />
       <AdcashDisplayBanner />
 
-      {/* Breaking Ticker */}
-    {posts.length > 0 && pathname === "/" && (
-  <BreakingTicker posts={posts} />
+      
 )}
 
       {/* Video Slider */}
