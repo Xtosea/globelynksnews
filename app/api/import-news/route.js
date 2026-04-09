@@ -7,16 +7,6 @@ const parser = new Parser();
 const DEFAULT_IMAGE = "https://trendingnews.globelynks.com/no-image.jpg";
 
 // Popular news feeds
-const feeds = [
-  { url: "https://feeds.bbci.co.uk/news/rss.xml", source: "BBC News" },
-  { url: "https://www.vanguardngr.com/feed/", source: "Vanguard News" },
-  { url: "https://www.premiumtimesng.com/feed", source: "Premium Times" },
-  { url: "https://www.theguardian.com/world/rss", source: "The Guardian" },
-  { url: "https://www.cnn.com/rss/edition.rss", source: "CNN" },
-  { url: "https://feeds.nytimes.com/nyt/rss/HomePage", source: "NY Times" },
-  { url: "https://www.aljazeera.com/xml/rss/all.xml", source: "Al Jazeera" },
-  { url: "https://www.reutersagency.com/feed/?best-topics=top-news", source: "Reuters" },
-];
 
 const feeds = [
   { 
