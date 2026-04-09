@@ -5,9 +5,16 @@ import Footer from "./Footer";
 import BreakingTicker from "./BreakingTicker";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
+  const pathname = usePathname();
+
+  // Extract current category from URL if on /category/[category]
+  const currentCategory = pathname.startsWith("/category/")
+    ? pathname.split("/category/")[1]
+    : null;
 
   // Fetch latest posts for the breaking ticker
   useEffect(() => {
@@ -24,35 +31,40 @@ export default function Layout({ children }) {
     fetchPosts();
   }, []);
 
+  const categories = ["world", "politics", "nigeria", "technology", "business"];
+
   return (
     <>
       {/* Navbar */}
       <Navbar />
 
       {/* Breaking News Ticker */}
-      {posts.length > 0 && <BreakingTicker posts={posts} />}
+      {posts.length > 0 && (
+        <BreakingTicker posts={posts} category={currentCategory} />
+      )}
 
       {/* Category Banner */}
       <div className="bg-red-600 text-white py-2">
         <div className="max-w-7xl mx-auto px-6 flex gap-6 overflow-x-auto">
-          <Link href="/" className="font-semibold whitespace-nowrap">
+          <Link
+            href="/"
+            className={`font-semibold whitespace-nowrap ${
+              !currentCategory ? "underline" : ""
+            }`}
+          >
             🔥 Trending Headlines
           </Link>
-          <Link href="/category/world" className="whitespace-nowrap">
-            World
-          </Link>
-          <Link href="/category/politics" className="whitespace-nowrap">
-            Politics
-          </Link>
-          <Link href="/category/nigeria" className="whitespace-nowrap">
-            Nigeria
-          </Link>
-          <Link href="/category/technology" className="whitespace-nowrap">
-            Technology
-          </Link>
-          <Link href="/category/business" className="whitespace-nowrap">
-            Business
-          </Link>
+          {categories.map((cat) => (
+            <Link
+              key={cat}
+              href={`/category/${cat}`}
+              className={`whitespace-nowrap capitalize ${
+                currentCategory === cat ? "underline font-bold" : ""
+              }`}
+            >
+              {cat}
+            </Link>
+          ))}
         </div>
       </div>
 
