@@ -100,7 +100,8 @@ export default function Home() {
               </p>
             </div>
           )}
-
+        
+            <AdBlock />
          
 
           {/* OTHER ARTICLES */}
@@ -116,8 +117,7 @@ export default function Home() {
                   {post.title}
                 </h2>
               </a>
-            
-             <AdBlock />
+          
 
               {/* ARTICLE IMAGE */}
               <div className="w-full aspect-video rounded overflow-hidden bg-gray-200">
