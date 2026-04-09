@@ -71,6 +71,11 @@ export default function Layout({ children }) {
           ))}
         </div>
       </div>
+ 
+    {/* Back Button — MOVE HERE */}
+<div className="max-w-7xl mx-auto px-6">
+  <BackButton />
+</div>
 
       {/* Main Content */}
       <main className="min-h-screen">{children}</main>
@@ -84,7 +89,7 @@ export default function Layout({ children }) {
           </Link>
         </div>
       </div>
-      <BackButton />
+      
 
       {/* Footer */}
       <Footer />
