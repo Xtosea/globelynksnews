@@ -31,7 +31,7 @@ export default function CategoryPage() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto p-6">
+      <div className="max-w-6xl mx-auto px-4 py-6 w-full overflow-hidden">
         <h2 className="text-2xl font-bold capitalize">
           {category} News
         </h2>
@@ -41,23 +41,32 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-hidden">
+      
+      {/* Category Title */}
       <h1 className="text-3xl font-bold capitalize mb-6">
         {category} News
       </h1>
 
+      {/* Empty State */}
       {articles.length === 0 && (
-        <p>No articles yet in this category.</p>
+        <p className="text-gray-500">
+          No articles yet in this category.
+        </p>
       )}
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Articles Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
         {articles.map(article => (
           <Link
             key={article._id}
             href={`/articles/${article._id}`}
-            className="block border rounded-lg overflow-hidden hover:shadow-lg transition"
+            className="block bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden"
           >
-            <div className="aspect-video bg-gray-100">
+            
+            {/* Image */}
+            <div className="w-full aspect-video overflow-hidden bg-gray-100">
               <img
                 src={article.image}
                 alt={article.title}
@@ -65,22 +74,31 @@ export default function CategoryPage() {
               />
             </div>
 
+            {/* Content */}
             <div className="p-4">
+
+              {/* Source */}
               <p className="text-xs text-red-600 font-semibold uppercase mb-2">
                 {article.source}
               </p>
 
-              <h2 className="font-bold text-lg leading-tight">
+              {/* Title */}
+              <h2 className="font-bold text-lg leading-tight line-clamp-2">
                 {article.title}
               </h2>
 
+              {/* Date */}
               <p className="text-sm text-gray-500 mt-2">
                 {new Date(article.publishedAt).toLocaleDateString()}
               </p>
+
             </div>
+
           </Link>
         ))}
+
       </div>
+
     </div>
   );
 }
