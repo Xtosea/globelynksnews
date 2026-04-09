@@ -14,147 +14,134 @@ export default function Navbar() {
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const categories = [
-    "breaking", "politics", "business", "tech", "sports",
-    "entertainment", "education", "international", "health",
-    "interview", "news bulletins", "wedding", "ceremonies"
+    "breaking","politics","business","tech","sports",
+    "entertainment","education","international","health",
+    "interview","news bulletins","wedding","ceremonies"
   ];
-
-  const toggleDark = () => {
-    if (typeof window !== "undefined") {
-      document.documentElement.classList.toggle("dark");
-    }
-  };
-
-  const handleLinkClick = () => {
-    setOpen(false);
-    setShowSuggestions(false);
-  };
 
   const handleSearch = () => {
     if (!search.trim()) return;
     router.push(`/search?q=${encodeURIComponent(search)}`);
     setSearch("");
-    setShowSuggestions(false);
     setOpen(false);
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") handleSearch();
-  };
-
   useEffect(() => {
-    if (!search.trim()) {
-      setSuggestions([]);
-      return;
-    }
+    if (!search.trim()) return setSuggestions([]);
 
     const delay = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/posts?search=${search}`);
-        const data = await res.json();
-        setSuggestions(data.slice(0, 5));
-        setShowSuggestions(true);
-      } catch (err) {
-        console.error("Search suggestion error:", err);
-      }
+      const res = await fetch(`/api/posts?search=${search}`);
+      const data = await res.json();
+      setSuggestions(data.slice(0, 5));
+      setShowSuggestions(true);
     }, 300);
 
     return () => clearTimeout(delay);
   }, [search]);
 
   return (
-    <header className="sticky top-0 z-50 shadow-sm bg-white">
-      {/* Top Bar */}
-      <div className="bg-red-700 text-white py-2 px-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <span className="font-bold text-lg tracking-wide">GLOBELYNKS</span>
+    <>
+      {/* TOP BAR */}
+      <header className="sticky top-0 z-[300] bg-red-700 text-white">
+        <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-2">
 
-          <div className="flex items-center gap-2 md:gap-3">
-            {/* Search */}
+          <span className="font-bold text-lg tracking-wide">
+            GLOBELYNKS
+          </span>
+
+          <div className="flex items-center gap-2">
+
+            {/* SEARCH */}
             <div className="relative">
               <div className="flex">
                 <input
-                  type="text"
-                  placeholder="Search news..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  onFocus={() => setShowSuggestions(true)}
-                  onKeyDown={handleKeyPress}
-                  className="px-2 py-1 rounded-l text-black w-24 sm:w-32 md:w-48 lg:w-64"
+                  placeholder="Search news..."
+                  className="px-2 py-1 text-black rounded-l w-32 md:w-64"
                 />
                 <button
                   onClick={handleSearch}
-                  className="bg-black text-white px-3 py-1 rounded-r"
+                  className="bg-black px-3 py-1 rounded-r"
                 >
                   🔍
                 </button>
               </div>
 
-              {/* Suggestions */}
               {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-white shadow-lg rounded mt-1 z-50">
-                  {suggestions.map((post) => (
+                <div className="absolute bg-white text-black w-full shadow z-[999]">
+                  {suggestions.map((p) => (
                     <Link
-                      key={post._id}
-                      href={`/post/${post.slug}`}
-                      onClick={handleLinkClick}
-                      className="block px-4 py-2 hover:bg-gray-100 text-black text-sm"
+                      key={p._id}
+                      href={`/post/${p.slug}`}
+                      onClick={() => setOpen(false)}
+                      className="block px-3 py-2 hover:bg-gray-100"
                     >
-                      {post.title}
+                      {p.title}
                     </Link>
                   ))}
                 </div>
               )}
-
-              {showSuggestions && search && suggestions.length === 0 && (
-                <div className="absolute bg-white shadow-lg px-4 py-2 text-sm text-gray-500 w-full">
-                  No results found
-                </div>
-              )}
             </div>
 
-            {/* Dark Mode */}
-            <button onClick={toggleDark} className="bg-gray-200 text-black px-2 py-1 rounded">
-              🌙
-            </button>
-
-            {/* Hamburger */}
+            {/* HAMBURGER */}
             <button
-              className="md:hidden text-2xl px-2 py-1"
-              onClick={() => setOpen(!open)}
+              onClick={() => setOpen(true)}
+              className="text-2xl px-2"
             >
               ☰
             </button>
+
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Hamburger Menu Categories */}
-      <nav className={`bg-white border-b md:hidden ${open ? "block" : "hidden"}`}>
-        <div className="px-6 py-2 flex flex-col gap-2">
-          <Link
-            href="/"
-            onClick={handleLinkClick}
-            className={`font-semibold text-sm ${pathname === "/" ? "text-red-600" : "text-gray-700"}`}
-          >
-            HOME
-          </Link>
-          {categories.map((cat) => {
-            const slug = cat.toLowerCase().replace(/\s+/g, "-");
-            const isActive = pathname === `/category/${slug}`;
-            return (
-              <Link
-                key={slug}
-                href={`/category/${slug}`}
-                onClick={handleLinkClick}
-                className={`uppercase text-sm font-semibold ${isActive ? "text-red-600" : "text-gray-700 hover:text-red-600"}`}
-              >
-                {cat}
-              </Link>
-            );
-          })}
+      {/* FULL SCREEN MENU (THIS FIXES YOUR SCROLL ISSUE) */}
+      {open && (
+        <div className="fixed inset-0 bg-white z-[999] overflow-y-auto">
+
+          {/* CLOSE BUTTON */}
+          <div className="flex justify-between items-center px-6 py-4 border-b">
+            <span className="font-bold text-lg">Menu</span>
+            <button
+              onClick={() => setOpen(false)}
+              className="text-2xl"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* HOME LINK (YOUR TRENDING HEADLINES) */}
+          <div className="px-6 py-4 border-b">
+            <Link
+              href="/"
+              onClick={() => setOpen(false)}
+              className="text-red-600 font-bold text-lg"
+            >
+              🔥 Trending Headlines
+            </Link>
+          </div>
+
+          {/* CATEGORIES */}
+          <div className="px-6 py-4 grid gap-3">
+            {categories.map((cat) => {
+              const slug = cat.replace(/\s+/g, "-");
+
+              return (
+                <Link
+                  key={slug}
+                  href={`/category/${slug}`}
+                  onClick={() => setOpen(false)}
+                  className="text-gray-700 font-semibold uppercase hover:text-red-600"
+                >
+                  {cat}
+                </Link>
+              );
+            })}
+          </div>
+
         </div>
-      </nav>
-    </header>
+      )}
+    </>
   );
 }
