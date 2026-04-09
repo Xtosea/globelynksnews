@@ -1,25 +1,20 @@
-import "../styles/globals.css";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import BackButton from "../components/BackButton"; // import it
+"use client";
 
-export const metadata = {
-  title: "Globelynks News And Entertainment",
-  description: "News & Articles",
-};
+import { useRouter, usePathname } from "next/navigation";
 
-export default function RootLayout({ children }) {
+export default function BackButton() {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Hide button on homepage
+  if (pathname === "/") return null;
+
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="bg-white text-black transition-colors duration-300 dark:bg-gray-900 dark:text-white">
-        <Navbar />
-        <main className="min-h-screen max-w-4xl mx-auto px-4">
-          {/* BackButton will now appear on all pages except homepage */}
-          <BackButton />
-          {children}
-        </main>
-        <Footer />
-      </body>
-    </html>
+    <button
+      onClick={() => router.back()}
+      className="mt-4 mb-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:opacity-80 transition"
+    >
+      ← Back
+    </button>
   );
 }
