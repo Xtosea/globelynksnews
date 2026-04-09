@@ -45,7 +45,9 @@ export default function Layout({ children }) {
       <AdcashDisplayBanner />
 
       {/* Breaking Ticker */}
-      {posts.length > 0 && <BreakingTicker posts={posts} />}
+    {posts.length > 0 && pathname === "/" && (
+  <BreakingTicker posts={posts} />
+)}
 
       {/* Video Slider */}
       <AdcashVideoSlider />
