@@ -10,7 +10,7 @@ import BackButton from "./BackButton";
 import BreakingTicker from "./BreakingTicker";
 import ScrollTopButton from "./ScrollTopButton";
 import ReadingProgress from "./ReadingProgress";
-import AdcashBanner1 from "./AdcashBanner1"
+
 import AdcashVideoSlider from "./AdcashVideoSlider";
 import AdcashDisplayBanner from "./AdcashDisplayBanner";
 
@@ -112,10 +112,7 @@ export default function Layout({ children }) {
       <h1>Trending News</h1>
     </>
 
-     {/* AdcashBanner1 */}
-     <div>
-      <AdcashBanner1 />
-    </div>
+     
 
       {/* Scroll to Top */}
       <ScrollTopButton />
