@@ -10,6 +10,7 @@ import BackButton from "./BackButton";
 import BreakingTicker from "./BreakingTicker";
 import ScrollTopButton from "./ScrollTopButton";
 import ReadingProgress from "./ReadingProgress";
+import TrendingAd from "../components/TrendingAd";
 
 import AdcashVideoSlider from "./AdcashVideoSlider";
 import AdcashDisplayBanner from "./AdcashDisplayBanner";
@@ -45,6 +46,9 @@ export default function Layout({ children }) {
 
       {/* Navbar */}
       <Navbar />
+
+      <TrendingAd />
+
 
       {/* Ad Banner */}
       <AdcashDisplayBanner />
