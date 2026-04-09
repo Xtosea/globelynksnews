@@ -18,6 +18,49 @@ const feeds = [
   { url: "https://www.reutersagency.com/feed/?best-topics=top-news", source: "Reuters" },
 ];
 
+const feeds = [
+  { 
+    url: "https://feeds.bbci.co.uk/news/rss.xml", 
+    source: "BBC News",
+    category: "world"
+  },
+  { 
+    url: "https://www.vanguardngr.com/feed/", 
+    source: "Vanguard News",
+    category: "nigeria"
+  },
+  { 
+    url: "https://www.premiumtimesng.com/feed", 
+    source: "Premium Times",
+    category: "nigeria"
+  },
+  { 
+    url: "https://www.theguardian.com/world/rss", 
+    source: "Guardian",
+    category: "world"
+  },
+  { 
+    url: "https://www.cnn.com/rss/edition.rss", 
+    source: "CNN",
+    category: "world"
+  },
+  { 
+    url: "https://www.aljazeera.com/xml/rss/all.xml", 
+    source: "Al Jazeera",
+    category: "world"
+  },
+  {
+    url: "https://www.espn.com/espn/rss/news",
+    source: "ESPN",
+    category: "sports"
+  },
+  {
+    url: "https://feeds.feedburner.com/TechCrunch",
+    source: "TechCrunch",
+    category: "technology"
+  }
+];
+
 // Extract largest/first meaningful image from article page
 async function extractImageFromArticle(url) {
   try {
@@ -69,15 +112,17 @@ export async function GET() {
           if (!image) image = await extractImageFromArticle(item.link);
 
           await Article.create({
-            title: item.title,
-            content: item.contentSnippet || item.content || "",
-            image: image || DEFAULT_IMAGE,
-            source: feed.source,
-            originalUrl: item.link,
-            type: "rss",
-            publishedAt: item.pubDate ? new Date(item.pubDate) : new Date(),
-            categories: item.categories || [],
-          });
+  title: item.title,
+  content: item.contentSnippet || item.content || "",
+  image: image || DEFAULT_IMAGE,
+  source: feed.source,
+  category: feed.category,   // add this
+  originalUrl: item.link,
+  type: "rss",
+  publishedAt: item.pubDate
+    ? new Date(item.pubDate)
+    : new Date(),
+});
 
           imported++;
         }
