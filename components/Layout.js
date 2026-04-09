@@ -7,7 +7,7 @@ import Link from "next/link";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
-import BackButton from "../BackButton"; // import it
+import BackButton from "./BackButton"; // import it
 import BreakingTicker from "./BreakingTicker";
 
 export default function Layout({ children }) {
