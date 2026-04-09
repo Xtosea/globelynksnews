@@ -2,16 +2,18 @@
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import BreakingTicker from "./BreakingTicker";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
+
+// Dynamically import BreakingTicker (client-only)
+const BreakingTicker = dynamic(() => import("./BreakingTicker"), { ssr: false });
 
 export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
   const pathname = usePathname(); // can be null during SSR
 
-  // Safely check pathname for current category
   const currentCategory =
     pathname && pathname.startsWith("/category/")
       ? pathname.split("/category/")[1]
@@ -35,7 +37,6 @@ export default function Layout({ children }) {
 
   return (
     <>
-      {/* Navbar */}
       <Navbar />
 
       {/* Breaking News Ticker */}
@@ -66,10 +67,8 @@ export default function Layout({ children }) {
         </div>
       </div>
 
-      {/* Main Content */}
       <main className="min-h-screen">{children}</main>
 
-      {/* More Headlines */}
       <div className="bg-gray-100 py-8">
         <div className="max-w-7xl mx-auto px-6">
           <h3 className="text-xl font-bold mb-4">More Trending Headlines</h3>
@@ -79,7 +78,6 @@ export default function Layout({ children }) {
         </div>
       </div>
 
-      {/* Footer */}
       <Footer />
     </>
   );
