@@ -86,7 +86,7 @@ export default function Home() {
               </a>
 
             <div>
-      <AdcashBanner />
+      <AdcashBanner1 />
     </div>
 
               {/* TOP IMAGE */}
