@@ -9,14 +9,17 @@ import { usePathname } from "next/navigation";
 
 export default function Layout({ children }) {
   const [posts, setPosts] = useState([]);
-  const pathname = usePathname();
+  const pathname = usePathname(); // can be null during SSR
 
-  // Extract current category from URL if on /category/[category]
-  const currentCategory = pathname.startsWith("/category/")
-    ? pathname.split("/category/")[1]
-    : null;
+  // Safely check pathname for current category
+  const currentCategory =
+    pathname && pathname.startsWith("/category/")
+      ? pathname.split("/category/")[1]
+      : null;
 
-  // Fetch latest posts for the breaking ticker
+  const categories = ["world", "politics", "nigeria", "technology", "business"];
+
+  // Fetch posts for ticker
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -27,11 +30,8 @@ export default function Layout({ children }) {
         console.error("Failed to fetch posts for ticker:", err);
       }
     };
-
     fetchPosts();
   }, []);
-
-  const categories = ["world", "politics", "nigeria", "technology", "business"];
 
   return (
     <>
@@ -39,9 +39,7 @@ export default function Layout({ children }) {
       <Navbar />
 
       {/* Breaking News Ticker */}
-      {posts.length > 0 && (
-        <BreakingTicker posts={posts} category={currentCategory} />
-      )}
+      {posts.length > 0 && <BreakingTicker posts={posts} category={currentCategory} />}
 
       {/* Category Banner */}
       <div className="bg-red-600 text-white py-2">
@@ -71,7 +69,7 @@ export default function Layout({ children }) {
       {/* Main Content */}
       <main className="min-h-screen">{children}</main>
 
-      {/* More Headlines Section */}
+      {/* More Headlines */}
       <div className="bg-gray-100 py-8">
         <div className="max-w-7xl mx-auto px-6">
           <h3 className="text-xl font-bold mb-4">More Trending Headlines</h3>
