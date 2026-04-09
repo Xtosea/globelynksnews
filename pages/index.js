@@ -6,10 +6,12 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AdBlock from "../components/AdBlock";
 import StickyShare from "../components/StickyShare";
-
+import AdcashVideoSlider from "./AdcashVideoSlider";
 import Link from "next/link";
 import SocialShare from "../components/SocialShare";
-
+import AdcashDisplayBanner from "@/components/AdcashDisplayBanner";
+import BreakingTicker from "./BreakingTicker";
+{/* Breaking Ticker */}
 
 
 export default function Home() {
@@ -55,11 +57,14 @@ export default function Home() {
 
       <StickyShare />
 
-      <main className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
+      <main className="max-w-[1450px] mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
 
         {/* MAIN NEWS COLUMN */}
         <div className="md:col-span-3 space-y-10">
 
+          <AdcashDisplayBanner />
+        <BreakingTicker posts={posts} />
+         
           {/* TOP ARTICLE */}
           {posts[0] && (
             <div>
@@ -73,8 +78,8 @@ export default function Home() {
                 </h1>
               </a>
 
-          
-
+         
+        
               {/* TOP IMAGE */}
               <div className="w-full aspect-video rounded overflow-hidden bg-gray-200">
   <img
@@ -131,7 +136,11 @@ export default function Home() {
     className="w-full h-full object-cover"
   />
 </div>
-              <SocialShare post={post} />
+             
+      {/* Video Slider */}
+      <AdcashVideoSlider />
+
+ <SocialShare post={post} />
               {post.source && (
                 <p className="text-gray-400 text-sm">
                   Source: {post.source}
