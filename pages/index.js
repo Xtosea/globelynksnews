@@ -57,7 +57,7 @@ export default function Home() {
 
       <StickyShare />
 
-      <main className="w-full px-6 py-10 grid md:grid-cols-4 gap-10">
+      <main className="w-full mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
 
         {/* MAIN NEWS COLUMN */}
         <main className="w-full px-6 py-10 grid md:grid-cols-4 gap-10">
