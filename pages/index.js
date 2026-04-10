@@ -53,7 +53,7 @@ export default function Home() {
    <>
     
    
-   
+   <BreakingTicker posts={posts} />
 
       <StickyShare />
 
@@ -63,7 +63,7 @@ export default function Home() {
         <div className="md:col-span-3 space-y-10">
 
           {/*<AdcashDisplayBanner />*/}
-        <BreakingTicker posts={posts} />
+        
          
           {/* TOP ARTICLE */}
           {posts[0] && (
