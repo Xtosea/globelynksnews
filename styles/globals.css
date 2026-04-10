@@ -1,9 +1,9 @@
 /* ===================== Base Variables ===================== */
 :root {
-  --color-accent1: #fafafa;       /* light background */
-  --color-accent2: #eaeaea;       /* slightly darker light bg */
-  --color-accent7: #333;          /* dark text */
-  --color-success: #0070f3;       /* highlight color */
+  --color-accent1: #fafafa;
+  --color-accent2: #eaeaea;
+  --color-accent7: #333;
+  --color-success: #0070f3;
   --color-cyan: #79ffe1;
   --color-blue500: #2276fc;
   --color-yellow100: #fef7da;
@@ -13,12 +13,16 @@
 
 /* ===================== Dark Mode ===================== */
 html.dark {
-  --color-accent1: #111827;       /* dark bg */
-  --color-accent2: #1f2937;       /* slightly lighter dark bg */
-  --color-accent7: #f3f4f6;       /* light text */
+  --color-accent1: #111827;
+  --color-accent2: #1f2937;
+  --color-accent7: #f3f4f6;
 }
 
 /* ===================== Body Base ===================== */
+html, body {
+  overflow-x: hidden;
+}
+
 body {
   font-family: system-ui, sans-serif;
   background-color: var(--color-accent1);
@@ -42,7 +46,7 @@ a {
 }
 
 a:hover {
-  color: #ef4444; /* red-600 hover */
+  color: #ef4444;
 }
 
 /* ===================== Buttons ===================== */
@@ -59,13 +63,14 @@ header {
 
 /* ===================== Sticky Share ===================== */
 .sticky-share {
-  pointer-events: auto; /* ensure clicks work */
+  pointer-events: auto;
 }
 
 /* ===================== Marquee Animation ===================== */
+
 @keyframes marquee {
   0% {
-    transform: translateX(0%);
+    transform: translateX(0);
   }
   100% {
     transform: translateX(-50%);
@@ -73,18 +78,15 @@ header {
 }
 
 .animate-marquee {
-  display: flex;
-  width: max-content;
+  display: inline-flex;
+  white-space: nowrap;
+  gap: 2rem;
   animation: marquee 25s linear infinite;
+  will-change: transform;
 }
 
-.animate-marquee {
-  display: inline-flex; /* keep flex for multiple children */
-  animation: marquee 20s linear infinite; /* consistent duration */
-  white-space: nowrap; /* prevent line breaks */
-  gap: 2.5rem; /* optional spacing between headlines */
-}
 /* ===================== Scrollbar Styling ===================== */
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -100,6 +102,7 @@ header {
 }
 
 /* ===================== Utility Classes ===================== */
+
 .flex-center {
   display: flex;
   align-items: center;
@@ -111,30 +114,31 @@ header {
 }
 
 /* ===================== Responsive Inputs ===================== */
+
 input {
   outline: none;
   border: 1px solid #ccc;
 }
 
 input:focus {
-  border-color: #ef4444; /* red-600 focus */
+  border-color: #ef4444;
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
 }
 
 /* ===================== Dark Mode Specific ===================== */
+
 html.dark body {
   background-color: var(--color-accent1);
   color: var(--color-accent7);
 }
 
 html.dark input {
-  background-color: #374151; /* gray-700 */
-  color: #f3f4f6; /* gray-100 */
-  border-color: #4b5563; /* gray-600 */
+  background-color: #374151;
+  color: #f3f4f6;
+  border-color: #4b5563;
 }
 
 html.dark input:focus {
   border-color: #ef4444;
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
 }
-
