@@ -2,6 +2,7 @@ import Parser from "rss-parser";
 import * as cheerio from "cheerio";
 import { connectDB } from "@/lib/mongodb";
 import Article from "@/models/Article";
+import { generateNewsSummary } from "@/lib/ai";
 
 const parser = new Parser();
 const DEFAULT_IMAGE = "https://trendingnews.globelynks.com/no-image.jpg";
@@ -51,7 +52,7 @@ function detectCategory(title, content, fallback) {
   return fallback || "world";
 }
 
-// Feeds
+// RSS Feeds
 const feeds = [
   { url: "https://feeds.bbci.co.uk/news/rss.xml", source: "BBC News", category: "world" },
   { url: "https://www.vanguardngr.com/feed/", source: "Vanguard", category: "nigeria" },
@@ -63,7 +64,7 @@ const feeds = [
   { url: "https://feeds.feedburner.com/TechCrunch", source: "TechCrunch", category: "technology" }
 ];
 
-// Extract Image
+// Extract Image from Article Page
 async function extractImageFromArticle(url) {
   try {
     const res = await fetch(url, {
@@ -101,6 +102,7 @@ export async function GET() {
 
           if (exists) continue;
 
+          // IMAGE
           let image =
             item.enclosure?.url ||
             item["media:content"]?.url ||
@@ -111,13 +113,38 @@ export async function GET() {
             image = await extractImageFromArticle(item.link);
           }
 
-          // Smart category detection
+          // CATEGORY
           const category = detectCategory(
             item.title,
             item.contentSnippet || item.content,
             feed.category
           );
 
+          // AI SUMMARY (SAFE)
+          let shortSummary = "";
+          let whyItMatters = "";
+
+          try {
+            const aiData = await generateNewsSummary(
+              item.title,
+              item.contentSnippet || item.content || ""
+            );
+
+            shortSummary = aiData.shortSummary;
+            whyItMatters = aiData.whyItMatters;
+
+          } catch (err) {
+            console.log("AI error:", err.message);
+
+            shortSummary =
+              item.contentSnippet?.slice(0, 180) ||
+              "Summary not available.";
+
+            whyItMatters =
+              "This news may be relevant to current global developments.";
+          }
+
+          // SAVE ARTICLE
           await Article.create({
             title: item.title,
             content: item.contentSnippet || item.content || "",
@@ -129,6 +156,10 @@ export async function GET() {
             publishedAt: item.pubDate
               ? new Date(item.pubDate)
               : new Date(),
+
+            // AI FIELDS
+            shortSummary,
+            whyItMatters,
           });
 
           imported++;
