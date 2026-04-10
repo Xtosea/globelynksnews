@@ -50,24 +50,21 @@ export default function Home() {
 
   return (
    
-   <>
+   
     
    
-   <BreakingTicker posts={posts} />
+<>
+  <BreakingTicker posts={posts} />
+  <StickyShare />
 
-      <StickyShare />
+  <main className="w-full px-6 py-10 grid md:grid-cols-4 gap-10">
 
-      <main className="w-full mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
+    {/* MAIN NEWS COLUMN */}
+    <div className="md:col-span-3 space-y-8">
 
-        {/* MAIN NEWS COLUMN */}
-        <main className="w-full px-6 py-10 grid md:grid-cols-4 gap-10">
-
-          {/*<AdcashDisplayBanner />*/}
-        
-         
-          {/* TOP ARTICLE */}
-          {posts[0] && (
-            <div>
+      {/* TOP ARTICLE */}
+      {posts[0] && (
+        <div>
               <a
                 href={posts[0].originalUrl || `/articles/${posts[0].slug}`}
                 target={posts[0].originalUrl ? "_blank" : "_self"}
