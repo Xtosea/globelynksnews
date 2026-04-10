@@ -12,25 +12,26 @@ export default function BreakingTicker({ posts, category }) {
   if (breakingPosts.length === 0) return null;
 
   return (
-    <div className="bg-red-600 text-white py-2 overflow-hidden w-full">
-      
-      <div className="relative w-full overflow-hidden">
-        
-        <div className="flex gap-8 animate-marquee whitespace-nowrap">
+    <div className="bg-red-600 text-white flex items-center overflow-hidden w-full">
+
+      <span className="bg-black px-4 py-2 font-bold whitespace-nowrap">
+        BREAKING
+      </span>
+
+      <div className="overflow-hidden flex-1 py-2">
+        <div className="inline-flex gap-8 animate-marquee whitespace-nowrap">
           {[...breakingPosts, ...breakingPosts].map((post, index) => (
             <Link
               key={post._id || post.slug || index}
               href={post.originalUrl || `/articles/${post.slug}`}
-              target={post.originalUrl ? "_blank" : "_self"}
-              rel={post.originalUrl ? "noopener noreferrer" : ""}
-              className="font-semibold whitespace-nowrap shrink-0"
+              className="font-semibold whitespace-nowrap"
             >
               🔴 {post.title}
             </Link>
           ))}
         </div>
-
       </div>
+
     </div>
   );
 }
