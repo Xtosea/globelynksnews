@@ -9,7 +9,7 @@ import StickyShare from "../components/StickyShare";
 import AdcashVideoSlider from "../components/AdcashVideoSlider";
 import Link from "next/link";
 import SocialShare from "../components/SocialShare";
-import AdcashDisplayBanner from "@/components/AdcashDisplayBanner";
+//import AdcashDisplayBanner from "@/components/AdcashDisplayBanner";
 import BreakingTicker from "../components/BreakingTicker";
 
 
@@ -62,7 +62,7 @@ export default function Home() {
         {/* MAIN NEWS COLUMN */}
         <div className="md:col-span-3 space-y-10">
 
-          <AdcashDisplayBanner />
+          {/*<AdcashDisplayBanner />*/}
         <BreakingTicker posts={posts} />
          
           {/* TOP ARTICLE */}
