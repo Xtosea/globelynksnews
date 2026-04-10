@@ -10,7 +10,7 @@ import AdcashVideoSlider from "../components/AdcashVideoSlider";
 import Link from "next/link";
 import SocialShare from "../components/SocialShare";
 import AdcashDisplayBanner from "@/components/AdcashDisplayBanner";
-//import BreakingTicker from "../components/BreakingTicker";
+import BreakingTicker from "../components/BreakingTicker";
 
 
 
@@ -63,7 +63,7 @@ export default function Home() {
         <div className="md:col-span-3 space-y-10">
 
           <AdcashDisplayBanner />
-        {/*<BreakingTicker posts={posts} />*/}
+        <BreakingTicker posts={posts} />
          
           {/* TOP ARTICLE */}
           {posts[0] && (
