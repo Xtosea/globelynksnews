@@ -12,7 +12,13 @@ const fetchNews = async () => { setLoading(true); const res = await fetch("/api/
 
 const toggleSelect = (id) => { setSelected((prev) => prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id] ); };
 
-const deleteOne = async (id) => { await fetch(/api/news/${id}, { method: "DELETE" }); setNews(news.filter((n) => n._id !== id)); };
+const deleteOne = async (id) => {
+  await fetch(`/api/news/${id}`, {
+    method: "DELETE",
+  });
+
+  setNews(news.filter((n) => n._id !== id));
+};
 
 const deleteSelected = async () => { if (selected.length === 0) return;
 
